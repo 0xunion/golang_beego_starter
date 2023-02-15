@@ -1,0 +1,210 @@
+/* @MT-TPL-FILE
+ * @Desc: CURD API接口控制器模板
+ * @To: doc/<%=OPT.the_name%>.md
+ * @Replace: overwrite
+ */
+
+# <%= OPT.TheName %> CURD API接口
+## 接口标准格式
+### 请求数据格式
+`www-form-urlencoded`
+
+eg:
+```
+name=hello&age=18&arr[]=1&arr[]=2
+```
+### 返回数据格式
+`JSON`
+
+eg:
+```
+{
+    "code": 0,
+    "message": "success",
+    "data": {
+        "name": "hello",
+        "age": 18,
+        "arr": [1, 2]
+    }
+}
+```
+### 错误代码
+#### 通用错误代码
+> 通用错误代码范围：-1000 ~ 1000，不同的业务模块可以自定义错误代码
+
+| code | message | description |
+| --- | --- | --- |
+| 0 | success | 成功 |
+| < 0 | abstract of error | 错误描述 |
+| -500 | internal server error | 服务器内部错误，如数据库IO超时 |
+| -501 | not implemented | 未实现 |
+| -400 | bad params | 参数错误 |
+| -401 | unauthorized | 未登录 |
+| -403 | forbidden | 禁止访问，权限不足 |
+
+### 接口认证
+> 通过`Authorization`请求头传递`token`，token的获取方式见[登录接口](./auth.md)
+
+## <%= OPT.TheName %> CURD API接口
+### 创建
+创建<%= OPT.the_name %>对象，将对象保存到数据库 <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/create` <br>
+**Request Data** : 
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'create')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'form') { _%>
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%> 
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%> 
+<%_ } _%>
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | object | 数据 |
+<%_ for (const field of H.fields(DATA, OPT.the_name)) { _%>
+| data.<%= field.name %> | <%= field.value.type %> | null |
+<%_ } _%>
+
+### 更新
+更新<%= OPT.the_name %>对象，将对象保存到数据库 <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/update` <br>
+**Request Data** :
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'update')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'form') { _%> 
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%>
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%>
+<%_ } _%>
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | object | 数据 |
+<%_ for (const field of H.fields(DATA, OPT.the_name)) { _%>
+| data.<%= field.name %> | <%= field.value.type %> | null |
+<%_ } _%>
+
+### 删除
+删除<%= OPT.the_name %>对象，将对象从数据库中删除 <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/delete` <br>
+**Request Data** :
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'delete')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'delete') == 'form') { _%>
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%>
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'delete') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%>
+<%_ } _%>
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | null | null |
+
+### 查询
+查询<%= OPT.the_name %> <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/get` <br>
+**Request Data** :
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'get')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'get') == 'form') { _%>
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%>
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'get') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%>
+<%_ } _%>
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | object | 数据 |
+<%_ for (const field of H.fields(DATA, OPT.the_name)) { _%>
+| data.<%= field.name %> | <%= field.value.type %> | null |
+<%_ } _%>
+
+### 列表
+查询<%= OPT.the_name %>列表 <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/list` <br>
+**Request Data** :
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'list')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'list') == 'form') { _%>
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%>
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'list') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%>
+<%_ } _%>
+| index | int | 页起始偏移 |
+| limit | int | 每页数量 |
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | object | 数据 |
+<%_ for (const field of H.fields(DATA, OPT.the_name)) { _%>
+| data[].<%= field.name %> | <%= field.value.type %> | null |
+<%_ } _%>
+
+### 搜索
+搜索<%= OPT.the_name %>列表 <br>
+**Method** : `POST` <br>
+**URL** : `/api/curd/<%= OPT.the_name %>/search` <br>
+**Request Data** :
+| 字段名 | 类型 | 验证规则 |
+| --- | --- | --- |
+<%_ for (const field of H.fields(DATA, OPT.the_name, 'search')) { _%>
+<%_ if (H.field_generate_type(DATA, OPT.the_name, field.name, 'search') == 'form') { _%>
+<%_ if (H.field_validate(DATA, OPT.the_name, field.name)) { _%>
+| <%= field.name %> | <%= field.value.type %> | <%= H.field_validate(DATA, OPT.the_name, field.name) %> |
+<%_ } _%>
+<%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'search') == 'id') { _%>
+| id | PrimaryId | Required |
+<%_ } _%>
+<%_ } _%>
+| index | int | 页起始偏移 |
+| limit | int | 每页数量 |
+
+**Response Data** :
+| 字段名 | 类型 | 描述 |
+| --- | --- | --- |
+| code | int | 代码 |
+| message | string | 描述 |
+| data | object | 数据 |
+<%_ for (const field of H.fields(DATA, OPT.the_name)) { _%>
+| data[].<%= field.name %> | <%= field.value.type %> | null |
+<%_ } _%>

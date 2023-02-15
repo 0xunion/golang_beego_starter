@@ -1,0 +1,409 @@
+{
+    /*
+        such as "CDN" "Dir" "WebFinger" and so on, all of them belong to develop
+        user has no reason to read write or delete them, so, only admin or model manager
+        can access them
+    */
+    "tables": {
+        /*
+        type CDN struct {
+            BasicType
+            Id       PrimaryId `json:"id" bson:"_id,omitempty"`
+            Name     string    `json:"name" bson:"name"`
+            Owner    PrimaryId `json:"owner" bson:"owner"`     // the owner of this cdn
+            Domain   string    `json:"domain" bson:"domain"`
+            CreateAt int64     `json:"create_at" bson:"create_at"` // unix timestamp
+        }
+        */
+        "cdn": {
+            "index" : 0,
+            "scenarios" : {
+                "create" : {
+                    "name" : "form",
+                    "domain" : "form",
+                    "id" : null,
+                    "create_at" : "timestamp",
+                    "owner" : "uid"
+                },
+                "get" : {
+                    "id" : "id"
+                },
+                "update" : {
+                    "id" : "id",
+                    "name" : "form",
+                    "domain" : "form"
+                },
+                "delete" : {
+                    "id" : "id"
+                },
+                "list" : {
+                },
+                "search" : {
+                    "name" : "form",
+                }
+            },
+            "permissions" : {
+                "create" : [/*{
+                    "role" : "model" // the manager of the model can do this
+                }, */{
+                    "role" : "admin" // the admin can do this
+                }, /*{
+                    "role" : "belong" // the user who created this can do this
+                }, {
+                    "role" : "all" // all users can do this
+                }, */{
+                    "role" : "extend", // which means accessor.uid == manager
+                    "value" : [{
+                        "field" : "manager", // all fields available
+                        "action" : "eq", // eq, ne, gt, lt, gte, lte
+                        "user" : "uid"
+                    }]
+                }],
+                "get" : [{
+                    "role" : "all"
+                }],
+                "update" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }, {
+                    "role" : "belong"
+                }, {
+                    "role" : "extend",
+                    "value" : [{
+                        "field" : "manager",
+                        "action" : "eq",
+                        "user" : "uid"
+                    }]
+                }],
+                "delete" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }, {
+                    "role" : "extend",
+                    "value" : [{
+                        "field" : "manager",
+                        "action" : "eq",
+                        "user" : "uid"
+                    }]
+                }],
+                "list" : [{
+                    "role" : "all"
+                }],
+                "search" : [{
+                    "role" : "all"
+                }]
+            },
+            "fields": {
+                "id": {
+                    "field": "id",
+                    "type": "master_types.PrimaryId",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "name": {
+                    "field": "name",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    },
+                },
+                "domain": {
+                    "field": "domain",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    }
+                },
+                "create_at": {
+                    "field": "create_at",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "owner" : {
+                    "field" : "owner",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "is_permission_id" : true, 
+                    "form_validate" : {}
+                }
+            },
+            "type_name": "CDN",
+            "description" : "CDN是一个用于记录哪些域名属于CDN范围的数据模型，当扫描器遇到CDN时，它会跳过执行一些扫描工作以避免资源浪费"
+        },
+        /*
+        type Dir struct {
+            BasicType
+            Id       PrimaryId `json:"id" bson:"_id,omitempty"`
+            Path     string    `json:"path" bson:"path"`
+            Source   string    `json:"source" bson:"source"`
+            CreateAt int64     `json:"create_at" bson:"create_at"`
+            Owner    PrimaryId `json:"uid" bson:"uid"` // who create this dir
+        }
+        */
+        "dir": {
+            "index" : 1,
+            "scenarios" : {
+                "create" : {
+                    "path" : "form",
+                    "source" : "form",
+                    "id" : null,
+                    "create_at" : "timestamp",
+                    "owner" : "uid"
+                },
+                "get" : {
+                    "id" : "id"
+                },
+                "update" : {
+                    "id" : "id",
+                    "path" : "form",
+                    "source" : "form"
+                },
+                "delete" : {
+                    "id" : "id"
+                },
+                "list" : {
+                },
+                "search" : {
+                    "path" : "form",
+                }
+            },
+            "permissions" : {
+                "create" : [{
+                    "role" : "admin"
+                },{
+                    "role" : "model"
+                }],
+                "get" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }],
+                "update" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "belong"
+                }],
+                "delete" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "belong"   
+                }],
+                "list" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }],
+                "search" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }]
+            },
+            "fields": {
+                "id": {
+                    "field": "id",
+                    "type": "master_types.PrimaryId",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "path": {
+                    "field": "path",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    }
+                },
+                "source": {
+                    "field": "source",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 256
+                    },
+                },
+                "create_at": {
+                    "field": "create_at",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "owner" : {
+                    "field" : "owner",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "is_permission_id" : true, 
+                    "form_validate" : {}
+                }
+            },
+            "type_name": "Dir",
+            "description" : "Dir数据模型记录为路径爆破时所使用的路径列表"
+        },
+        /*
+        type WebFinger struct {
+            Finger
+            BasicType
+            ScanType string    `json:"scan_type" bson:"scan_type"` // 1. scan once 2. scan interactive
+            Id       PrimaryId `json:"id" bson:"_id,omitempty"`
+            Owner    PrimaryId `json:"owner" bson:"owner"`
+            CreateAt int64     `json:"create_at" bson:"create_at"` // unix timestamp
+            Cms      string    `json:"cms" bson:"cms"`             // pointer to CMS name
+            Location string    `json:"location" bson:"location"`   // pointer to CMS location
+            Method   string    `json:"method" bson:"method"`       // 1. hashicon 2. regex 3. keyword
+            Keyword  []string  `json:"keyword" bson:"keyword"`     // keyword like "wordpress" or "hash(icon)"
+        }
+        */
+        "web_finger" : {
+            "index" : 2,
+            "scenarios" : {
+                "create" : {
+                    "scan_type" : "form",
+                    "id" : null,
+                    "owner" : "uid",
+                    "create_at" : "timestamp",
+                    "cms" : "form",
+                    "location" : "form",
+                    "method" : "form",
+                    "keyword" : "form"
+                },
+                "get" : {
+                    "id" : "id"
+                },
+                "update" : {
+                    "id" : "id",
+                    "scan_type" : "form",
+                    "cms" : "form",
+                    "location" : "form",
+                    "method" : "form",
+                    "keyword" : "form"
+                },
+                "delete" : {
+                    "id" : "id"
+                },
+                "list" : {
+                },
+                "search" : {
+                    "cms" : "form",
+                }
+            },
+            "permissions" : {
+                "create" : [{
+                    "role" : "admin"
+                },{
+                    "role" : "model"
+                }],
+                "get" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }],
+                "update" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "belong"
+                }],
+                "delete" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "belong"   
+                }],
+                "list" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }],
+                "search" : [{
+                    "role" : "admin"
+                }, {
+                    "role" : "model"
+                }]
+            },
+            "fields": {
+                "id": {
+                    "field": "id",
+                    "type": "master_types.PrimaryId",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "scan_type": {
+                    "field": "scan_type",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20,
+                    },
+                },
+                "cms": {
+                    "field": "cms",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20,
+                    },
+                },
+                "location": {
+                    "field": "location",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 256,
+                    },
+                },
+                "method": {
+                    "field": "method",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20,
+                    },
+                },
+                "keyword": {
+                    "field": "keyword",
+                    "type": "[]string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    }
+                },
+                "create_at": {
+                    "field": "create_at",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "owner" : {
+                    "field" : "owner",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "is_permission_id" : true, 
+                    "form_validate" : {}
+                }
+            },
+            "type_name": "WebFinger",
+            "description" : "WebFinger为Web服务指纹，Worker的信息收集模块会通过该数据结构来识别目标站点的框架、中间件、服务等信息，以便后续扫描"
+        }
+    }
+}

@@ -1,0 +1,338 @@
+/* @MT-TPL-FILE
+ * @Desc: CURD API接口控制器模板
+ * @To: src/controller/curd/<%=OPT.the_name%>.go
+ * @Replace: -
+ */
+package curd
+
+/* @MT-TPL-IMPORT-START */
+import (
+	controller "${package}/src/controller"
+	master_types "${package}/src/types"
+    master_service "${package}/src/service/curd"
+	beego "github.com/beego/beego/v2/server/web"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+/* @MT-TPL-IMPORT-END */
+
+/* @MT-TPL-CREATE-START */
+type <%= OPT.TheName %>CreateController struct {
+    beego.Controller
+} 
+/* @MT-TPL-CREATE-END */
+
+/* @MT-TPL-UPDATE-START */
+type <%= OPT.TheName %>UpdateController struct {
+    beego.Controller
+} 
+/* @MT-TPL-UPDATE-END */
+
+/* @MT-TPL-DELETE-START */
+type <%= OPT.TheName %>DeleteController struct {
+    beego.Controller
+} 
+/* @MT-TPL-DELETE-END */
+
+/* @MT-TPL-GET-START */
+type <%= OPT.TheName %>GetController struct {
+    beego.Controller
+} 
+/* @MT-TPL-GET-END */
+
+/* @MT-TPL-LIST-START */
+type <%= OPT.TheName %>ListController struct {
+    beego.Controller
+}
+/* @MT-TPL-LIST-END */
+
+/* @MT-TPL-SEARCH-START */
+type <%= OPT.TheName %>SearchController struct {
+    beego.Controller
+}
+/* @MT-TPL-SEARCH-END */
+
+/* @MT-TPL-CREATE-FUNC-START */
+func (c *<%= OPT.TheName %>CreateController) Post() {
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+
+    var request_params struct {
+    <%_ for( const field of H.fields(DATA, OPT.the_name,'create')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'form' ){_%>
+        <% //check type, if the target type is an array, use Bind instead %>
+        <%_ if( !field.value.type.startsWith("[") ){_%>
+        <%= H.bc(field.name) %> <%= field.value.type %> `json:"<%= H.ul(field.name) %>" form:"<%= H.ul(field.name) %>" validate:"<%= H.field_validate(DATA, OPT.the_name, field.name) %>"`
+        <%_ } _%>
+    <%_}_%>
+    <%_}_%>
+    }
+
+    if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+
+    <% // bind array %>
+    <%_ for( const field of H.fields(DATA, OPT.the_name, 'create')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'form' ){_%>
+    <%_ if( field.value.type.startsWith("[") ){_%>
+    var <%= H.ul(field.name) %> <%= field.value.type %>
+    if err := c.Ctx.Input.Bind(&<%= H.ul(field.name) %>, "<%= H.ul(field.name) %>"); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_ } _%>
+    <%_ } _%>
+    <%_ } _%> 
+
+    // TODO: service
+    c.Ctx.Output.JSON(
+        master_service.Create<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'create')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'form' ){_%>
+            <%_ if( field.value.type.startsWith("[") ){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } else {_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } _%>
+            <%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'create') == 'id'){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+        ),
+    true, false)
+}
+/* @MT-TPL-CREATE-FUNC-END */
+
+/* @MT-TPL-UPDATE-FUNC-START */
+func (c *<%= OPT.TheName %>UpdateController) Post() {
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+
+    var request_params struct {
+    <%_ for( const field of H.fields(DATA, OPT.the_name, 'update')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'form' ){_%>
+    <%  //check type, if the target type is an array, use Bind instead %>
+    <%_ if( !field.value.type.startsWith("[") ){_%> 
+        <%= H.bc(field.name) %> <%= field.value.type %> `json:"<%= H.ul(field.name) %>" form:"<%= H.ul(field.name) %>" validate:"<%= H.field_validate(DATA, OPT.the_name, field.name) %>"`
+    <%_ } _%>
+    <%_}_%>
+    <%_}_%>
+    }
+
+    <%_ if ((H.fields(DATA, OPT.the_name, 'update')??[]).length > 0){_%>
+    if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    <% // bind array %>
+    <%_ for( const field of H.fields(DATA, OPT.the_name, 'update')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'form' ){_%>
+    <%_ if( field.value.type.startsWith("[") ){_%>
+    var <%= H.ul(field.name) %> <%= field.value.type %>
+    if err := c.Ctx.Input.Bind(&<%= H.ul(field.name) %>, "<%= H.ul(field.name) %>"); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_ } _%>
+    <%_ } _%>
+    <%_ } _%>
+
+    <% //if id is required in update, just parse it %>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, 'id', 'update') == 'id' ){_%>
+    id, err := primitive.ObjectIDFromHex(c.GetString("id", ""))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    // TODO: service
+    c.Ctx.Output.JSON(
+        master_service.Update<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'update')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'form' ){_%>
+            <%_ if( field.value.type.startsWith("[") ){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } else {_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } _%>
+            <%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'update') == 'id'){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+        ),
+    true, false)
+}
+
+/* @MT-TPL-UPDATE-FUNC-END */
+
+/* @MT-TPL-DELETE-FUNC-START */
+func (c *<%= OPT.TheName %>DeleteController) Post() {
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+    
+    <% //if id is required in update, just parse it %>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, 'id', 'delete') == 'id' ){_%>
+    id, err := primitive.ObjectIDFromHex(c.GetString("id", ""))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    // TODO
+    c.Ctx.Output.JSON(
+        master_service.Delete<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'delete')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'delete') == 'form' ){_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'delete') == 'id'){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+        ),
+    true, false)
+}
+/* @MT-TPL-DELETE-FUNC-END */
+
+/* @MT-TPL-GET-FUNC-START */
+func (c *<%= OPT.TheName %>GetController) Get() {
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+
+    <% //if id is required in update, just parse it %>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, 'id', 'get') == 'id' ){_%>
+    id, err := primitive.ObjectIDFromHex(c.GetString("id", ""))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    // TODO
+    c.Ctx.Output.JSON(
+        master_service.Get<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'get')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'get') == 'form' ){_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } else if (H.field_generate_type(DATA, OPT.the_name, field.name, 'get') == 'id'){_%>
+            <%= H.ul(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+        ),
+    true, false)
+}
+/* @MT-TPL-GET-FUNC-END */
+
+/* @MT-TPL-LIST-FUNC-START */
+func (c *<%= OPT.TheName %>ListController) Get() {
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+
+    var request_params struct {
+    <%_ for( const field of H.fields(DATA, OPT.the_name, 'list')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'list') == 'form' ){_%>
+        <%= H.bc(field.name) %> <%= field.value.type %> `json:"<%= H.ul(field.name) %>" form:"<%= H.ul(field.name) %>" validate:"<%= H.field_validate(DATA, OPT.the_name, field.name) %>"`
+    <%_}_%>
+    <%_}_%>
+        Index int64 `json:"index" form:"index"`
+        Limit int64 `json:"limit" form:"limit"`
+    }
+
+    <%_ if ((H.fields(DATA, OPT.the_name, 'list')??[]).length > 0){_%>
+    if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    // TODO
+    c.Ctx.Output.JSON(
+        master_service.List<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'list')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'list') == 'form' ){_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+            request_params.Index,
+            request_params.Limit,
+        ),
+    true, false)
+}
+/* @MT-TPL-LIST-FUNC-END */
+
+/* @MT-TPL-SEARCH-FUNC-START */
+func (c *<%= OPT.TheName %>SearchController) Get() {
+    user_interface := c.Ctx.Input.GetData("user")
+    if user_interface == nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+        return
+    }
+
+    user := user_interface.(*master_types.User)
+
+    var request_params struct {
+    <%_ for( const field of H.fields(DATA, OPT.the_name, 'search')??[] ){_%>
+    <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'search') == 'form' ){_%>
+        <%= H.bc(field.name) %> <%= field.value.type %> `json:"<%= H.ul(field.name) %>" form:"<%= H.ul(field.name) %>" validate:"<%= H.field_validate(DATA, OPT.the_name, field.name) %>"`
+    <%_}_%>
+    <%_}_%>
+        Index int64 `json:"index" form:"index"`
+        Limit int64 `json:"limit" form:"limit"`
+    }
+
+    <%_ if ((H.fields(DATA, OPT.the_name, 'search')??[]).length > 0){_%>
+    if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_}_%>
+
+    // TODO
+    c.Ctx.Output.JSON(
+        master_service.Search<%= OPT.TheName %>Service(
+            user,
+            <%_ for( const field of H.fields(DATA, OPT.the_name, 'search')??[] ){_%>
+            <%_ if( H.field_generate_type(DATA, OPT.the_name, field.name, 'search') == 'form' ){_%>
+            request_params.<%= H.bc(field.name) %>,
+            <%_ } _%>
+            <%_ } _%>
+            request_params.Index,
+            request_params.Limit,
+        ),
+    true, false)
+}
+/* @MT-TPL-SEARCH-FUNC-END */

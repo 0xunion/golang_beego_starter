@@ -1,0 +1,36 @@
+/* @MT-TPL-FILE
+ * @Desc: 后端用户权限更新
+ * @To: src/types/user.go
+ * @Replace: -
+ */
+
+package types
+
+type User struct {
+    BasicType
+    Id              PrimaryId `json:"id" bson:"_id,omitempty"`
+    UserFlag        int64     `json:"user_flag" bson:"user_flag"`
+    ModelPermission int64     `json:"model_permission" bson:"model_permission"`
+}
+ 
+const (
+    USER_FLAG_ADMIN = 1 << 0
+
+    /* @MT-TPL-PERMISSION-START */
+    /* @Replace: append */
+    /* @SkipIf: USER_MODEL_PERMISSION_<%= OPT.TheName %> */
+    USER_MODEL_PERMISSION_<%= OPT.TheName %> = 1 << <%= H.table(DATA, OPT.TheName).index %>
+    /* @MT-TPL-PERMISSION-END */
+)
+ 
+func (u *User) IsAdmin() bool {
+    return u.UserFlag&USER_FLAG_ADMIN == USER_FLAG_ADMIN
+}
+
+/* @MT-TPL-PERMISSION-FUNC-START */
+/* @Replace: append */
+/* @SkipIf: AllowManage<%= OPT.TheName %> */
+func (u *User) AllowManage<%= OPT.TheName %>() bool {
+    return u.ModelPermission & USER_MODEL_PERMISSION_<%= OPT.TheName %> == USER_MODEL_PERMISSION_<%= OPT.TheName %>
+}
+/* @MT-TPL-PERMISSION-FUNC-END */

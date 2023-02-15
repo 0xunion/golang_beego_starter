@@ -1,0 +1,31 @@
+/* @MT-TPL-FILE
+ * @Desc: 后端路由更新
+ * @To: src/routers/routes.go
+ * @Replace: -
+ */
+
+package routers
+
+/* @MT-TPL-IMPORT-LIST-START */
+import (
+    curd "${package}/src/controller/curd"
+    beego "github.com/beego/beego/v2/server/web"
+)
+/* @MT-TPL-IMPORT-LIST-END */
+
+/* @MT-TPL-ROUTE-CURD-FUNC-DECL-START */
+func registerCURDApi() {
+/* @MT-TPL-ROUTE-CURD-FUNC-DECL-END */
+    /* @MT-TPL-ROUTE-CURD-START */
+    /* @Replace: append */
+    /* @SkipIf: beego.Router("/api/curd/<%=OPT.the_name%> */
+    <%_ for( action of ['create','update','delete', 'get', 'list', 'search'] ){_%>
+    beego.Router("/api/curd/<%=OPT.the_name%>/<%=action%>", &curd.<%=OPT.TheName%><%=H.bc(action)%>Controller{})
+    <%_}_%>
+    /* @MT-TPL-ROUTE-CURD-END */
+/* @MT-TPL-ROUTE-CURD-FUNC-END-START */
+}
+/* @MT-TPL-ROUTE-CURD-FUNC-END-END */
+ 
+func registerProd() {
+}
