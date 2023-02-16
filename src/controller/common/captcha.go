@@ -1,7 +1,7 @@
 package common
 
 import (
-	"${package}/src/service/common"
+	"github.com/0xunion/exercise_back/src/service/common"
 	beego "github.com/beego/beego/v2/server/web"
 )
 

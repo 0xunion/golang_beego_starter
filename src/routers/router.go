@@ -3,11 +3,11 @@ package routers
 import (
 	"time"
 
-	conf "${package}/src/const/conf"
-	"${package}/src/model"
-	"${package}/src/types"
-	auth "${package}/src/util/auth"
-	"${package}/src/util/decorator"
+	conf "github.com/0xunion/exercise_back/src/const/conf"
+	"github.com/0xunion/exercise_back/src/model"
+	"github.com/0xunion/exercise_back/src/types"
+	auth "github.com/0xunion/exercise_back/src/util/auth"
+	"github.com/0xunion/exercise_back/src/util/decorator"
 	beego "github.com/beego/beego/v2/server/web"
 	context "github.com/beego/beego/v2/server/web/context"
 )

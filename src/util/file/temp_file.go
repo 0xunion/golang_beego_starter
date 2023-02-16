@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"${package}/src/const/conf"
-	"${package}/src/routine"
+	"github.com/0xunion/exercise_back/src/const/conf"
+	"github.com/0xunion/exercise_back/src/routine"
 )
 
 var (

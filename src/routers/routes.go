@@ -2,8 +2,8 @@ package routers
 
 /* @MT-TPL-IMPORT-LIST-START */
 import (
-	common "${package}/src/controller/common"
-	curd "${package}/src/controller/curd"
+	common "github.com/0xunion/exercise_back/src/controller/common"
+	curd "github.com/0xunion/exercise_back/src/controller/curd"
 	beego "github.com/beego/beego/v2/server/web"
 )
 

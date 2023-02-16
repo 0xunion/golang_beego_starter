@@ -1,9 +1,9 @@
 package common
 
 import (
-	"${package}/src/controller"
-	"${package}/src/service/common"
-	"${package}/src/types"
+	"github.com/0xunion/exercise_back/src/controller"
+	"github.com/0xunion/exercise_back/src/service/common"
+	"github.com/0xunion/exercise_back/src/types"
 	beego "github.com/beego/beego/v2/server/web"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

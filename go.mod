@@ -1,4 +1,4 @@
-module ${package}
+module github.com/0xunion/exercise_back
 
 go 1.18
 

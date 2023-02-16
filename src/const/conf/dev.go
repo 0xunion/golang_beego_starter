@@ -3,7 +3,7 @@ package conf
 import (
 	"os"
 
-	routine "${package}/src/routine"
+	routine "github.com/0xunion/exercise_back/src/routine"
 	beego "github.com/beego/beego/v2/server/web"
 )
 

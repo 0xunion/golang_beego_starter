@@ -13,8 +13,8 @@ import (
 	"math/big"
 	"time"
 
-	"${package}/src/const/conf"
-	"${package}/src/types"
+	"github.com/0xunion/exercise_back/src/const/conf"
+	"github.com/0xunion/exercise_back/src/types"
 )
 
 var seucre_token_padding string

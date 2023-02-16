@@ -15,11 +15,11 @@ import (
 	"sync"
 	"time"
 
-	config "${package}/src/const/conf"
-	redis_key "${package}/src/const/key"
-	routine "${package}/src/routine"
-	memcache "${package}/src/routine/cache"
-	strings "${package}/src/util/strings"
+	config "github.com/0xunion/exercise_back/src/const/conf"
+	redis_key "github.com/0xunion/exercise_back/src/const/key"
+	routine "github.com/0xunion/exercise_back/src/routine"
+	memcache "github.com/0xunion/exercise_back/src/routine/cache"
+	strings "github.com/0xunion/exercise_back/src/util/strings"
 	redis "github.com/go-redis/redis/v8"
 )
 

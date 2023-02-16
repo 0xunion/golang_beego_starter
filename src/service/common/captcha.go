@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"${package}/src/routine/cache"
-	"${package}/src/types"
-	"${package}/src/util/auth"
-	"${package}/src/util/num"
-	"${package}/src/util/strings"
+	"github.com/0xunion/exercise_back/src/routine/cache"
+	"github.com/0xunion/exercise_back/src/types"
+	"github.com/0xunion/exercise_back/src/util/auth"
+	"github.com/0xunion/exercise_back/src/util/num"
+	"github.com/0xunion/exercise_back/src/util/strings"
 )
 
 /*

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"${package}/src"
+	"github.com/0xunion/exercise_back/src"
 )
 
 func main() {

@@ -7,8 +7,8 @@ package curd
 
 /* @MT-TPL-IMPORT-START */
 import (
-    model "${package}/src/model"
-    master_types "${package}/src/types"
+    model "github.com\\\\/0xunion\\\\/exercise_back/src/model"
+    master_types "github.com\\\\/0xunion\\\\/exercise_back/src/types"
     <%_ if (H.count_generate_type(DATA, OPT.the_name, 'create', 'timestamp') + 
         H.count_generate_type(DATA, OPT.the_name, 'delete', 'timestamp') + 
         H.count_generate_type(DATA, OPT.the_name, 'update', 'timestamp') +

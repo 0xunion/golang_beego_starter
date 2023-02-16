@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"${package}/src/util/auth"
+	"github.com/0xunion/exercise_back/src/util/auth"
 )
 
 type LoginEmail struct {

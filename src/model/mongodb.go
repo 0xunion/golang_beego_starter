@@ -11,10 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	conf "${package}/src/const/conf"
-	routine "${package}/src/routine"
-	"${package}/src/util/meta"
-	strings "${package}/src/util/strings"
+	conf "github.com/0xunion/exercise_back/src/const/conf"
+	routine "github.com/0xunion/exercise_back/src/routine"
+	"github.com/0xunion/exercise_back/src/util/meta"
+	strings "github.com/0xunion/exercise_back/src/util/strings"
 )
 
 type MongoFilter = bson.D

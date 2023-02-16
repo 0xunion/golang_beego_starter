@@ -3,10 +3,10 @@ package common
 import (
 	"time"
 
-	"${package}/src/model"
-	"${package}/src/types"
-	"${package}/src/util/auth"
-	"${package}/src/util/strings"
+	"github.com/0xunion/exercise_back/src/model"
+	"github.com/0xunion/exercise_back/src/types"
+	"github.com/0xunion/exercise_back/src/util/auth"
+	"github.com/0xunion/exercise_back/src/util/strings"
 )
 
 /*
