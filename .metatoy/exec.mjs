@@ -38,7 +38,31 @@ if( fs.existsSync(data_file) )
     if( parsed ) db_data = parsed;
 }
 
-if( command_name?.toLocaleLowerCase() == 'new' )
+const tpl_path = path.join(meta_dir,'_template', ...command_args);
+
+if (command_name?.toLocaleLowerCase() == 'custom')
+{
+    // 加载自定义接口配置文件
+    let custom_data = {};
+    const custom_file_name = options['custom-file'] || 'metatoy.custom.jsonc';
+    const custom_file = path.join(__dirname, custom_file_name);
+    if( fs.existsSync(custom_file) )
+    {
+        const parsed =  JSONC.parse(fs.readFileSync(custom_file, 'utf8'));
+        if( parsed ) custom_data = parsed;
+    }
+
+    // 循环每一个自定义接口配置
+    for( let key in custom_data ) {
+        const custom = custom_data[key];
+        if( custom )
+        {
+            console.log( `🚀 ${key} 处理中...` );
+            engine( path.join(tpl_path, 'api/custom.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
+        }
+    }
+} 
+else if( command_name?.toLocaleLowerCase() == 'new' ) 
 {
     if( !options.name )
     {
@@ -53,8 +77,6 @@ if( command_name?.toLocaleLowerCase() == 'new' )
     options.cn_name = options.cn_name ?? options.TheName;
 
     // console.log( options );
-    
-    const tpl_path = path.join(meta_dir,'_template', ...command_args);
     // console.log( tpl_path );
     const tpl_file = path.join(tpl_path) + '.tpl.ejs';
     const tpl_files = [];

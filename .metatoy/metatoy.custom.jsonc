@@ -1,0 +1,31 @@
+[
+    {
+        "route" : "/api/custom/admin/game/create",
+        "method" : "POST",
+        // controller layer argument check
+        "args" : {
+            "name" : "string",
+            "description" : "string",
+            "header_html" : "string",
+            "start_time" : "int64",
+            "end_time" : "int64"
+        },
+        // service layer permission check
+        "permissions" : [
+            {
+                "condition" : "and",
+                "mode" : "admin"
+            }
+        ],
+        // create service layer or not
+        "service" : {
+            "generate" : true
+        },
+        "response" : {
+            "success" : "bool"
+        }
+    },
+    {
+        "route" : ""
+    }
+]

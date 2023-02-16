@@ -3,6 +3,8 @@ package model
 import (
 	"context"
 	"errors"
+	"reflect"
+	gostrings "strings"
 	"sync"
 	"time"
 
@@ -164,10 +166,17 @@ func mongoConnect() error {
 	return nil
 }
 
+var last_check_time int64
+
 func checkAlive() bool {
 	if mongoConn == nil {
 		mongoConnMutex.Lock()
 		defer mongoConnMutex.Unlock()
+	}
+
+	// check if there is a checkAlive request in 30 seconds
+	if time.Now().Unix()-last_check_time < 30 {
+		return true
 	}
 
 	// the code below will cause serval performance problems
@@ -184,6 +193,7 @@ func checkAlive() bool {
 			return false
 		}
 	}
+	last_check_time = time.Now().Unix()
 	return true
 }
 
@@ -269,4 +279,224 @@ func ModelDelete[T any](filter MongoFilter) error {
 	coll := mongoConn.Database(conf.MongoDBName()).Collection(collection)
 	_, err := coll.DeleteOne(context.Background(), filter)
 	return err
+}
+
+// ModelGetJoin return the model join with other model
+// R is the result model with join data, T is the model we want
+// foreign Model info must be set in lookup
+type Lookup struct {
+	From         string
+	LocalField   string
+	ForeignField string
+	As           string
+}
+
+var lookup_cache = make(map[string][]Lookup)
+var lookup_cache_mutex = sync.RWMutex{}
+
+func getLookupCache(key string) ([]Lookup, bool) {
+	lookup_cache_mutex.RLock()
+	defer lookup_cache_mutex.RUnlock()
+	lookup, ok := lookup_cache[key]
+	return lookup, ok
+}
+
+func setLookupCache(key string, lookup []Lookup) {
+	lookup_cache_mutex.Lock()
+	defer lookup_cache_mutex.Unlock()
+	lookup_cache[key] = lookup
+}
+
+func getLookup[T any, R any]() ([]Lookup, error) {
+	var origin T
+	var result R
+	collection := reflect.TypeOf(origin).Name()
+	// get lookup info from cache
+	lookup, ok := getLookupCache(collection)
+	if !ok {
+		// scan R to get lookup info
+		reflectR := reflect.ValueOf(result)
+		lookup = make([]Lookup, 0)
+		for i := 0; i < reflectR.NumField(); i++ {
+			field := reflectR.Type().Field(i)
+			if field.Type.Kind() == reflect.Struct {
+				// get tag
+				tag := field.Tag.Get("join")
+				if tag != "" {
+					if tag == "-" {
+						continue
+					}
+					// parse tag "uid=id"
+					tagList := gostrings.Split(tag, "=")
+					if len(tagList) != 2 {
+						return nil, errors.New("join tag error")
+					}
+					// get field type
+					fieldType := reflectR.Field(i).Type()
+					// get foreign collection name
+					foreignCollection := meta.GetTypeName(reflect.New(fieldType).Interface())
+					localField := ""
+					foreignField := ""
+					// use reflect to get bson tag
+					// walk through all fields in struct to find the bson tag
+					for j := 0; j < reflectR.NumField(); j++ {
+						field := reflectR.Type().Field(j)
+						if field.Type.Kind() == reflect.Struct {
+							continue
+						}
+						bsonTag := field.Tag.Get("bson")
+						if bsonTag == tagList[0] {
+							localField = bsonTag
+						}
+					}
+					// walk through all fields in struct to find the bson tag
+					for j := 0; j < fieldType.NumField(); j++ {
+						field := fieldType.Field(j)
+						if field.Type.Kind() == reflect.Struct {
+							continue
+						}
+						bsonTag := field.Tag.Get("bson")
+						if bsonTag == tagList[1] {
+							foreignField = bsonTag
+						}
+					}
+
+					// check if we get the localField and foreignField
+					if localField == "" || foreignField == "" {
+						return nil, errors.New("join tag error")
+					}
+
+					// add to lookup
+					lookup = append(lookup, Lookup{
+						From:         foreignCollection,
+						LocalField:   localField,
+						ForeignField: foreignField,
+						As:           field.Name,
+					})
+				}
+			}
+		}
+
+		// set lookup cache
+		setLookupCache(collection, lookup)
+	}
+
+	return lookup, nil
+}
+
+func ModelGetJoin[T any, R any](filter MongoFilter) (*R, error) {
+	var origin T
+	collection := meta.GetTypeName(origin)
+	if !checkAlive() {
+		return nil, errors.New("mongodb connection lost")
+	}
+	coll := mongoConn.Database(conf.MongoDBName()).Collection(collection)
+
+	// get lookup info
+	lookup, err := getLookup[T, R]()
+	if err != nil {
+		return nil, err
+	}
+
+	// create lookup
+	lookupList := make([]bson.D, 0)
+	for _, item := range lookup {
+		lookupList = append(lookupList, bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: item.From},
+				{Key: "localField", Value: item.LocalField},
+				{Key: "foreignField", Value: item.ForeignField},
+				{Key: "as", Value: item.As},
+			}},
+		})
+
+		// add unwind
+		lookupList = append(lookupList, bson.D{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$" + item.As},
+				{Key: "preserveNullAndEmptyArrays", Value: true},
+			}},
+		})
+	}
+
+	// create pipeline
+	pipeline := make([]bson.D, 0)
+	pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
+	pipeline = append(pipeline, lookupList...)
+	pipeline = append(pipeline, bson.D{{Key: "$limit", Value: 1}})
+
+	// exec pipeline
+	cursor, err := coll.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+	var result []*R
+	err = cursor.All(context.Background(), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	// join data
+	if len(result) > 0 {
+		return result[0], nil
+	}
+
+	return nil, errors.New("not found")
+}
+
+// ModelGetAllJoin return all the model join with other model
+// R is the result model with join data, T is the model we want
+// foreign Model info must be set in lookup
+func ModelGetAllJoin[T any, R any](filter MongoFilter) ([]*R, error) {
+	var origin T
+	collection := meta.GetTypeName(origin)
+	if !checkAlive() {
+		return nil, errors.New("mongodb connection lost")
+	}
+	coll := mongoConn.Database(conf.MongoDBName()).Collection(collection)
+
+	// get lookup info
+	lookup, err := getLookup[T, R]()
+	if err != nil {
+		return nil, err
+	}
+
+	// create lookup
+	lookupList := make([]bson.D, 0)
+	for _, item := range lookup {
+		lookupList = append(lookupList, bson.D{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: item.From},
+				{Key: "localField", Value: item.LocalField},
+				{Key: "foreignField", Value: item.ForeignField},
+				{Key: "as", Value: item.As},
+			}},
+		})
+
+		// add unwind
+		lookupList = append(lookupList, bson.D{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$" + item.As},
+				{Key: "preserveNullAndEmptyArrays", Value: true},
+			}},
+		})
+	}
+
+	// create pipeline
+	pipeline := make([]bson.D, 0)
+	pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
+	pipeline = append(pipeline, lookupList...)
+
+	// exec pipeline
+	cursor, err := coll.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+	var result []*R
+	err = cursor.All(context.Background(), &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

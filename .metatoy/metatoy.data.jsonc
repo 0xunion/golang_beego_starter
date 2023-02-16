@@ -139,22 +139,15 @@
             "type_name": "CDN",
             "description" : "CDN是一个用于记录哪些域名属于CDN范围的数据模型，当扫描器遇到CDN时，它会跳过执行一些扫描工作以避免资源浪费"
         },
-        /*
-        type Dir struct {
-            BasicType
-            Id       PrimaryId `json:"id" bson:"_id,omitempty"`
-            Path     string    `json:"path" bson:"path"`
-            Source   string    `json:"source" bson:"source"`
-            CreateAt int64     `json:"create_at" bson:"create_at"`
-            Owner    PrimaryId `json:"uid" bson:"uid"` // who create this dir
-        }
-        */
-        "dir": {
+        "game" : {
             "index" : 1,
             "scenarios" : {
                 "create" : {
-                    "path" : "form",
-                    "source" : "form",
+                    "name" : "form",
+                    "description" : "form",
+                    "header_html" : "form",
+                    "start_time" : "form",
+                    "end_time" : "form",
                     "id" : null,
                     "create_at" : "timestamp",
                     "owner" : "uid"
@@ -164,8 +157,11 @@
                 },
                 "update" : {
                     "id" : "id",
-                    "path" : "form",
-                    "source" : "form"
+                    "name" : "form",
+                    "description" : "form",
+                    "header_html" : "form",
+                    "start_time" : "form",
+                    "end_time" : "form"
                 },
                 "delete" : {
                     "id" : "id"
@@ -173,39 +169,27 @@
                 "list" : {
                 },
                 "search" : {
-                    "path" : "form",
+                    "name" : "form",
                 }
             },
             "permissions" : {
                 "create" : [{
                     "role" : "admin"
-                },{
-                    "role" : "model"
                 }],
                 "get" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }],
                 "update" : [{
                     "role" : "admin"
-                }, {
-                    "role" : "belong"
                 }],
                 "delete" : [{
                     "role" : "admin"
-                }, {
-                    "role" : "belong"   
                 }],
                 "list" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }],
                 "search" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }]
             },
             "fields": {
@@ -215,8 +199,18 @@
                     "default": null,
                     "form_validate" : {}
                 },
-                "path": {
-                    "field": "path",
+                "name": {
+                    "field": "name",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    },
+                },
+                "description": {
+                    "field": "description",
                     "type": "string",
                     "default": null,
                     "form_validate" : {
@@ -225,15 +219,27 @@
                         "max" : 20
                     }
                 },
-                "source": {
-                    "field": "source",
+                "header_html": {
+                    "field": "header_html",
                     "type": "string",
                     "default": null,
                     "form_validate" : {
                         "required" : true,
                         "min" : 3,
-                        "max" : 256
-                    },
+                        "max" : 1024
+                    }
+                },
+                "start_time": {
+                    "field": "start_time",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "end_time": {
+                    "field": "end_time",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
                 },
                 "create_at": {
                     "field": "create_at",
@@ -249,46 +255,32 @@
                     "form_validate" : {}
                 }
             },
-            "type_name": "Dir",
-            "description" : "Dir数据模型记录为路径爆破时所使用的路径列表"
+            "type_name": "Game",
+            "description" : "Game"
         },
-        /*
-        type WebFinger struct {
-            Finger
-            BasicType
-            ScanType string    `json:"scan_type" bson:"scan_type"` // 1. scan once 2. scan interactive
-            Id       PrimaryId `json:"id" bson:"_id,omitempty"`
-            Owner    PrimaryId `json:"owner" bson:"owner"`
-            CreateAt int64     `json:"create_at" bson:"create_at"` // unix timestamp
-            Cms      string    `json:"cms" bson:"cms"`             // pointer to CMS name
-            Location string    `json:"location" bson:"location"`   // pointer to CMS location
-            Method   string    `json:"method" bson:"method"`       // 1. hashicon 2. regex 3. keyword
-            Keyword  []string  `json:"keyword" bson:"keyword"`     // keyword like "wordpress" or "hash(icon)"
-        }
-        */
-        "web_finger" : {
+        "gamer" : {
             "index" : 2,
             "scenarios" : {
                 "create" : {
-                    "scan_type" : "form",
+                    "name" : "form",
                     "id" : null,
-                    "owner" : "uid",
+                    "phone" : "form",
                     "create_at" : "timestamp",
-                    "cms" : "form",
-                    "location" : "form",
-                    "method" : "form",
-                    "keyword" : "form"
+                    "owner" : "uid",
+                    "identity" : "form",
+                    "game_id" : "form",
+                    "permission" : "form"
                 },
                 "get" : {
                     "id" : "id"
                 },
                 "update" : {
                     "id" : "id",
-                    "scan_type" : "form",
-                    "cms" : "form",
-                    "location" : "form",
-                    "method" : "form",
-                    "keyword" : "form"
+                    "name" : "form",
+                    "phone" : "form",
+                    "identity" : "form",
+                    "game_id" : "form",
+                    "permission" : "form"
                 },
                 "delete" : {
                     "id" : "id"
@@ -296,39 +288,27 @@
                 "list" : {
                 },
                 "search" : {
-                    "cms" : "form",
+                    "name" : "form",
                 }
             },
             "permissions" : {
                 "create" : [{
                     "role" : "admin"
-                },{
-                    "role" : "model"
                 }],
                 "get" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }],
                 "update" : [{
                     "role" : "admin"
-                }, {
-                    "role" : "belong"
                 }],
                 "delete" : [{
                     "role" : "admin"
-                }, {
-                    "role" : "belong"   
                 }],
                 "list" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }],
                 "search" : [{
-                    "role" : "admin"
-                }, {
-                    "role" : "model"
+                    "role" : "all"
                 }]
             },
             "fields": {
@@ -338,49 +318,19 @@
                     "default": null,
                     "form_validate" : {}
                 },
-                "scan_type": {
-                    "field": "scan_type",
+                "name": {
+                    "field": "name",
                     "type": "string",
                     "default": null,
                     "form_validate" : {
                         "required" : true,
                         "min" : 3,
-                        "max" : 20,
+                        "max" : 20
                     },
                 },
-                "cms": {
-                    "field": "cms",
+                "phone": {
+                    "field": "phone",
                     "type": "string",
-                    "default": null,
-                    "form_validate" : {
-                        "required" : true,
-                        "min" : 3,
-                        "max" : 20,
-                    },
-                },
-                "location": {
-                    "field": "location",
-                    "type": "string",
-                    "default": null,
-                    "form_validate" : {
-                        "required" : true,
-                        "min" : 3,
-                        "max" : 256,
-                    },
-                },
-                "method": {
-                    "field": "method",
-                    "type": "string",
-                    "default": null,
-                    "form_validate" : {
-                        "required" : true,
-                        "min" : 3,
-                        "max" : 20,
-                    },
-                },
-                "keyword": {
-                    "field": "keyword",
-                    "type": "[]string",
                     "default": null,
                     "form_validate" : {
                         "required" : true,
@@ -400,10 +350,123 @@
                     "default" : null,
                     "is_permission_id" : true, 
                     "form_validate" : {}
+                },
+                "identity" : {
+                    "field" : "identity",
+                    "type" : "int64",
+                    "default" : null,
+                    "form_validate" : {}
+                },
+                "game_id" : {
+                    "field" : "game_id",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "form_validate" : {}
+                },
+                "permission" : {
+                    "field" : "permission",
+                    "type" : "int64",
+                    "default" : null,
+                    "form_validate" : {}
                 }
             },
-            "type_name": "WebFinger",
-            "description" : "WebFinger为Web服务指纹，Worker的信息收集模块会通过该数据结构来识别目标站点的框架、中间件、服务等信息，以便后续扫描"
-        }
+            "type_name": "Gamer",
+            "description" : "Gamer"
+        },
+        "defender" : {
+            "index" : 3,
+            "scenarios" : {
+                "create" : {
+                    "name" : "form",
+                    "id" : null,
+                    "create_at" : "timestamp",
+                    "owner" : "uid",
+                    "game_id" : "form",
+                    "score" : "default",
+                },
+                "get" : {
+                    "id" : "id"
+                },
+                "update" : {
+                    "id" : "id",
+                    "name" : "form",
+                    "game_id" : "form",
+                    "score" : "form",
+                },
+                "delete" : {
+                    "id" : "id"
+                },
+                "list" : {
+                },
+                "search" : {
+                    "name" : "form",
+                }
+            },
+            "permissions" : {
+                "create" : [{
+                    "role" : "admin"
+                }],
+                "get" : [{
+                    "role" : "all"
+                }],
+                "update" : [{
+                    "role" : "admin"
+                }],
+                "delete" : [{
+                    "role" : "admin"
+                }],
+                "list" : [{
+                    "role" : "all"
+                }],
+                "search" : [{
+                    "role" : "all"
+                }]
+            },
+            "fields": {
+                "id": {
+                    "field": "id",
+                    "type": "master_types.PrimaryId",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "name": {
+                    "field": "name",
+                    "type": "string",
+                    "default": null,
+                    "form_validate" : {
+                        "required" : true,
+                        "min" : 3,
+                        "max" : 20
+                    },
+                },
+                "create_at": {
+                    "field": "create_at",
+                    "type": "int64",
+                    "default": null,
+                    "form_validate" : {}
+                },
+                "owner" : {
+                    "field" : "owner",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "is_permission_id" : true, 
+                    "form_validate" : {}
+                },
+                "game_id" : {
+                    "field" : "game_id",
+                    "type" : "master_types.PrimaryId",
+                    "default" : null,
+                    "form_validate" : {}
+                },
+                "score" : {
+                    "field" : "score",
+                    "type" : "int64",
+                    "default" : 10000,
+                    "form_validate" : {}
+                },
+            },
+            "type_name": "Defender",
+            "description" : "Defender"
+        },
     }
 }
