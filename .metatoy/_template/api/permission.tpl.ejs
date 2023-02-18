@@ -1,0 +1,98 @@
+/* @MT-TPL-FILE
+ * @Desc: 定制化 权限模板，用于生成对细粒度权限控制数据结构的定义
+ * @To: src/types/permission/<%=H.ul(DATA.PER.type_name)%>.go
+ * @Replace: -
+ */
+/* @MT-TPL-PACKAGE-START */
+package permission
+/* @MT-TPL-PACKAGE-END */
+
+/* @MT-TPL-IMPORT-START */
+import (
+    "github.com/0xunion/exercise_back/src/types"
+)
+
+/* @MT-TPL-TYPE-START */
+type <%= H.bc(DATA.PER.type_name)%>Permission struct {
+    Id types.PrimaryId `json:"id" bson:"_id,omitempty"` // primary id
+    Type int `json:"type" bson:"type"` // which type of permission, e.g. "user", "group", "role"
+    OwnerId types.PrimaryId `json:"owner_id" bson:"owner_id"` // who owns this permission
+    Permission int `json:"permission" bson:"permission"` // permission value 
+    TargetId types.PrimaryId `json:"target_id" bson:"target_id"` // which target this permission belongs to
+}
+/* @MT-TPL-TYPE-END */
+
+/* @MT-TPL-PERMISSION-START */
+const (
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_USER = 1
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_GROUP = 2
+
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ = 1
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE = 2
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE = 4
+    <%= H.bc(DATA.PER.type_name)%>_PERMISSION_ALL = <%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ | <%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE | <%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE
+)
+/* @MT-TPL-PERMISSION-END */
+
+/* @MT-TPL-FUNC-START */
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) GetId() types.PrimaryId {
+    return p.Id
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) GroupAccessRead(gid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_GROUP && p.OwnerId == gid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) GroupAccessWrite(gid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_GROUP && p.OwnerId == gid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) GroupAccessDelete(gid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_GROUP && p.OwnerId == gid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UserAccessRead(uid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_USER && p.OwnerId == uid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UserAccessWrite(uid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_USER && p.OwnerId == uid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UserAccessDelete(uid types.PrimaryId) bool {
+    return p.Type == <%= H.bc(DATA.PER.type_name)%>_PERMISSION_TYPE_USER && p.OwnerId == uid && p.Permission & <%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE != 0
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) SetRead() {
+    p.Permission |= <%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) SetWrite() {
+    p.Permission |= <%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) SetDelete() {
+    p.Permission |= <%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) SetAll() {
+    p.Permission |= <%= H.bc(DATA.PER.type_name)%>_PERMISSION_ALL
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UnsetRead() {
+    p.Permission &= ^<%= H.bc(DATA.PER.type_name)%>_PERMISSION_READ
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UnsetWrite() {
+    p.Permission &= ^<%= H.bc(DATA.PER.type_name)%>_PERMISSION_WRITE
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UnsetDelete() {
+    p.Permission &= ^<%= H.bc(DATA.PER.type_name)%>_PERMISSION_DELETE
+}
+
+func (p *<%= H.bc(DATA.PER.type_name)%>Permission) UnsetAll() {
+    p.Permission &= ^<%= H.bc(DATA.PER.type_name)%>_PERMISSION_ALL
+}
+
+/* @MT-TPL-FUNC-END */

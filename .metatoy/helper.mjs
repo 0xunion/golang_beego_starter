@@ -47,6 +47,90 @@ export class Helper {
         return this.up1(this.lc(string));
     }
 
+    // 去除/并转大驼峰
+    u2bc(string)
+    {
+        return this.bc(string.replace(/\//g, '_'));
+    }
+
+    // 去除/并转小驼峰
+    u2lc(string)
+    {
+        return this.lc(string.replace(/\//g, '_'));
+    }
+
+    // 去除/并转下划线
+    u2ul(string)
+    {
+        let tmp = this.ul(string.replace(/\//g, '_'));
+        // 如果是以_开头，那么就去掉
+        if( tmp.charAt(0) == '_' ) {
+            tmp = tmp.substr(1);
+        }
+        return tmp;
+    }
+
+    custom_method( REQ ) 
+    {
+        return REQ.method
+    }
+
+    is_native_type( type )
+    {
+        return ['string', 'int', 'float', 'bool', 'int64', 'float64'].includes(type);
+    }
+
+    is_array_type( type )
+    {
+        console.log('xxx' + type)
+        return type.startsWith('[]');
+    }
+
+    is_id_type( type )
+    {
+        return type.indexOf('PrimaryId') != -1;
+    }
+
+    beego_validate( type, rules ) 
+    {
+        const validate_string = [];
+        for (let [key, value] of Object.entries(rules)) {
+            if( key == 'required' ) {
+                validate_string.push(`Required`);
+            }
+
+            if( key == 'min' ) {
+                if (type == 'string') {
+                    validate_string.push(`MinSize(${value})`);
+                } else {
+                    validate_string.push(`Min(${value})`);
+                }
+            }
+
+            if( key == 'max' ) {
+                if (type == 'string') {
+                    validate_string.push(`MaxSize(${value})`);
+                } else {
+                    validate_string.push(`Max(${value})`);
+                }
+            }
+
+            if( key == 'length' ) {
+                validate_string.push(`Length(${value})`);
+            }
+
+            if( key == 'range' ) {
+                validate_string.push(`Range(${value[0]}, ${value[1]})`);
+            }
+
+            if( key == 'regexp' ) {
+                validate_string.push(`Match(${value})`);
+            }
+        }
+
+        return validate_string.join(',');
+    }
+
     table( meta, table )
     {
         let tables = meta.DB.tables;
@@ -217,7 +301,6 @@ export class Helper {
         
         for (let [_, value] of Object.entries(tables[table].fields)) {
             if( value.is_permission_id ) {
-                console.log(value)
                 return value;
             }
         }

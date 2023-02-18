@@ -1,0 +1,92 @@
+/* @MT-TPL-FILE
+ * @Desc: 定制化 API接口控制器模板
+ * @To: src/controller/custom/<%=H.u2ul(DATA.REQ.route)%>.go
+ * @Replace: -
+ */
+
+/* @MT-TPL-PACKAGE-START */
+package custom
+/* @MT-TPL-PACKAGE-END */
+
+/* @MT-TPL-IMPORT-START */
+import (
+    beego "github.com/beego/beego/v2/server/web"
+    controller "github.com/0xunion/exercise_back/src/controller"
+    master_types "github.com/0xunion/exercise_back/src/types"
+    custom_service "github.com/0xunion/exercise_back/src/service/custom"
+    <% let require_primitive = false %>
+    <%_ for( const arg in DATA.REQ.args??[] ){_%>
+    <%_ if (H.is_id_type(DATA.REQ.args[arg].type)) {_%>
+    <%_ require_primitive = true %>
+    <%_ } _%>
+    <%_ } _%>
+    <%_ if (require_primitive) {_%>
+	"go.mongodb.org/mongo-driver/bson/primitive"
+    <%_ } _%>
+)
+/* @MT-TPL-IMPORT-END */
+
+/* @MT-TPL-CONTROLLER-START */
+type <%= H.u2bc(DATA.REQ.route)%>Controller struct {
+    beego.Controller
+}
+
+func (c *<%= H.u2bc(DATA.REQ.route)%>Controller) <%= H.bc(H.custom_method(DATA.REQ)) %>() {
+    <%_ if (DATA.REQ.require_login) {_%>
+    user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+    user := user_interface.(*master_types.User)
+    <%_ } _%>
+
+    var request_params struct {
+    <%_ for( const arg in DATA.REQ.args??[] ){_%>
+    <%_ if (H.is_native_type(DATA.REQ.args[arg].type)) {_%>
+        <%= H.bc(arg) %> <%= DATA.REQ.args[arg].type %> `json:"<%= arg %>" form:"<%= arg %>" validate:"<%= H.beego_validate(DATA.REQ.args[arg].type, DATA.REQ.args[arg].validate) %>"`
+    <%_ } _%>
+    <%_ } _%>
+    }
+
+    <%_ for( const arg in DATA.REQ.args??[] ){_%>
+    <%_ if (H.is_array_type(DATA.REQ.args[arg].type)) {_%>
+    request_params_<%= H.ul(arg) %> := make(<%= DATA.REQ.args[arg].type %>, 0)
+    c.Ctx.Input.Bind(&request_params_<%= H.ul(arg) %>, "<%= arg %>")
+    <%_ } _%>
+    <%_ } _%>
+
+    <%_ for( const arg in DATA.REQ.args??[] ){_%>
+    <%_ if (H.is_id_type(DATA.REQ.args[arg].type)) {_%>
+    request_params_<%= H.ul(arg) %>, err := primitive.ObjectIDFromHex(c.GetString("<%= arg %>"))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    <%_ } _%>
+    <%_ } _%>
+
+    if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+
+    response := custom_service.<%= H.u2bc(DATA.REQ.route)%>Service(
+        <%_ if (DATA.REQ.require_login) {_%>
+        user,
+        <%_ } _%>
+        <%_ for( const arg in DATA.REQ.args??[] ){_%>
+        <%_ if (H.is_native_type(DATA.REQ.args[arg].type)) {_%>
+        request_params.<%= H.bc(arg) %>,
+        <%_ } else if (H.is_array_type(DATA.REQ.args[arg].type)) {_%>
+        request_params_<%= H.ul(arg) %>,
+        <%_ } else if (H.is_id_type(DATA.REQ.args[arg].type)) {_%>
+        request_params_<%= H.ul(arg) %>,
+        <%_ } _%> 
+        <%_ } _%>
+    )
+    c.Ctx.Output.JSON(response, true, false)
+}
+
+/* @MT-TPL-CONTROLLER-END */

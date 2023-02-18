@@ -1,31 +1,152 @@
 [
     {
         "route" : "/api/custom/admin/game/create",
-        "method" : "POST",
+        "method" : "post",
         // controller layer argument check
         "args" : {
-            "name" : "string",
-            "description" : "string",
-            "header_html" : "string",
-            "start_time" : "int64",
-            "end_time" : "int64"
-        },
-        // service layer permission check
-        "permissions" : [
-            {
-                "condition" : "and",
-                "mode" : "admin"
+            "name" : {
+                "type" : "string",
+                "validate" : {
+                    "min" : 3,
+                    "max" : 64
+                },
+                "default" : ""
+            },
+            "description" : {
+                "type" : "string",
+                "validate" : {
+                    "min" : 3,
+                    "max" : 64
+                }
+            },
+            "header_html" : {
+                "type" : "string",
+                "validate" : {
+                    "min" : 3,
+                    "max" : 1024
+                }
+            },
+            "start_time" : {
+                "type" : "int64",
+                "validate" : {}
+            },
+            "end_time" : {
+                "type" : "int64",
+                "validate" : {}
             }
-        ],
+        },
+        "require_login" : true,
         // create service layer or not
         "service" : {
             "generate" : true
         },
+        // service layer permission check
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // {
+            //     "mode" : "granularity", // if a group has permission to 
+            //     "model" : "Game", // full type name
+            //     "model_info" : {
+            //         "id" : "game_id" // this point out how to get the model to be checked
+            //     },
+            //     "granularity" : "group",
+            //     "permission" : ["r", "w"]
+            // },
+            // {
+            //     "mode" : "granularity",
+            //     "granularity" : "user",
+            //     "model" : "Game",
+            //     "model_info" : {
+            //         "id" : "game_id"
+            //     },
+            //     "permission" : ["r", "w"]
+            // }
+        ],
+        "actions" : [
+            {
+                "type" : "create",
+                "model" : "Game",
+                "model_info" : {
+                    "name" : "name",
+                    "description" : "description",
+                    "header_html" : "header_html",
+                    "start_time" : "start_time",
+                    "end_time" : "end_time",
+                    "create_at" : "$time"
+                },
+                // permission to be created when the model is created
+                "permission" : [
+                    {
+                        "owner" : "uid",
+                        "permission" : ["r", "w"]
+                    }
+                ]
+            }
+        ],
         "response" : {
             "success" : "bool"
         }
     },
     {
-        "route" : ""
+        "route" : "/api/custom/admin/game/import/defender",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_type.PrimaryId",
+                "validate" : {}
+            },
+            "defender_file_id" : {
+                "type" : "master_type.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "import defender from file"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/red_team",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_type.PrimaryId",
+                "validate" : {}
+            },
+            "red_team_file_id" : {
+                "type" : "master_type.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "import red team from file"
     }
 ]

@@ -21,7 +21,6 @@ const { _: command, ...options } = args;
 const command_name = command[0];
 const command_args = command.slice(1);
 
-
 if( !command_name )
 {
     console.log('usage: exec new <template_dir> --name=<name> --data-file=<data_file>');
@@ -57,11 +56,24 @@ if (command_name?.toLocaleLowerCase() == 'custom')
         const custom = custom_data[key];
         if( custom )
         {
+            if(custom.service) {
+                console.log( `🚀 ${key} 处理中...` );
+                engine( path.join(tpl_path, 'api/custom_service.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
+            }
             console.log( `🚀 ${key} 处理中...` );
-            engine( path.join(tpl_path, 'api/custom.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
+            engine( path.join(tpl_path, 'api/custom_controller.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
         }
     }
 } 
+else if (command_name?.toLocaleLowerCase() == 'permission') {
+    for (let [key, value] of Object.entries(db_data.tables)) {
+        if( value )
+        {
+            console.log( `🚀 ${key} 处理中...` );
+            engine( path.join(tpl_path, 'api/permission.tpl.ejs'), {"DB":db_data,"PER":value}, options );
+        }
+    }
+}
 else if( command_name?.toLocaleLowerCase() == 'new' ) 
 {
     if( !options.name )

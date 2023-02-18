@@ -28,7 +28,7 @@ func IdFilter(id primitive.ObjectID) MongoFilterItem {
 }
 
 // check if the value is in the array
-func MongoArrayContainsFilter(key string, value ...interface{}) MongoFilterItem {
+func MongoArrayContainsFilter(key string, value interface{}) MongoFilterItem {
 	return MongoFilterItem{Key: key, Value: bson.M{"$in": value}}
 }
 

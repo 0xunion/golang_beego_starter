@@ -1,0 +1,224 @@
+/* @MT-TPL-FILE
+ * @Desc: 定制化 API服务层模板
+ * @To: src/service/custom/<%=H.u2ul(DATA.REQ.route)%>.go
+ * @Replace: -
+ */
+package custom
+
+/* @MT-TPL-IMPORT-START */
+import (
+    master_types "github.com/0xunion/exercise_back/src/types"
+    model "github.com/0xunion/exercise_back/src/model"
+    permission_type "github.com/0xunion/exercise_back/src/types/permission"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+
+    <%_ let require_time = false %>
+    <%_ for( const act in DATA.REQ.actions??[] ){_%>
+    <%_ for( const arg in DATA.REQ.actions[act].model_info??[] ){_%>
+    <%_ if (DATA.REQ.actions[act].model_info[arg].type == "$time") {_%>
+    <%_ require_time = true %>
+    <%_ } _%>
+    <%_ } _%>
+    <%_ } _%>
+    <%_ if (require_time) {_%>
+    "time"
+    <%_ } _%>
+)
+/* @MT-TPL-IMPORT-END */
+
+/* @MT-TPL-SERVICE-START */
+func <%= H.u2bc(DATA.REQ.route)%>Service(
+    <%_ if (DATA.REQ.require_login) {_%>
+    user *master_types.User,
+    <%_ } _%>
+    <%_ for( const arg in DATA.REQ.args??[] ){_%>
+    <%_ if (H.is_native_type(DATA.REQ.args[arg].type)) {_%>
+    <%= H.bc(arg) %> <%= DATA.REQ.args[arg].type %>,
+    <%_ } else if (H.is_array_type(DATA.REQ.args[arg].type)) {_%>
+    <%= H.bc(arg) %> <%= DATA.REQ.args[arg].type %>, 
+    <%_ } else if (H.is_id_type(DATA.REQ.args[arg].type)) {_%>
+    <%= H.bc(arg) %> master_types.PrimaryId,
+    <%_ } _%>
+    <%_ } _%>
+) (*master_types.MasterResponse) {
+    var <%= H.u2lc(DATA.REQ.route)%>Response struct {
+        <%_ for( const rep in DATA.REQ.response??[] ){_%>
+        <%= H.bc(rep) %> <%= DATA.REQ.response[rep] %> `json:"<%= rep %>"`
+        <%_ } _%>
+    }
+
+    // cache map, use to store the data that has been queried
+    service_cache := make(map[string]interface{})
+
+    access_controll := false
+    <%_ for (const arg in DATA.REQ.permissions??[]) {_%>
+    <%_ const permission = DATA.REQ.permissions[arg] _%>
+    <%_ if (DATA.REQ.permissions[arg].mode == 'admin') {_%>
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
+    <%_ } else if (DATA.REQ.permissions[arg].mode == 'granularity') {_%>
+    <%= // resolve granularity permission %>
+    <%= // check if granularity is user or group %>
+    if !access_controll {
+        <%= // get target model %>
+        <%= // check if model info contains id, if so, use id to get permission directly %>
+        <%= // if not, use other info to get target model instance and then get permission %>
+        var model_id master_types.PrimaryId = primitive.NilObjectID
+        <%_ for (const key in permission.model_info??[]) {_%>
+        <%_ if (key == 'id') {_%>
+        model_id = <%= H.ul(permission.model_info[key]) %>
+        <%_ } _%>
+        <%_ } _%>
+        
+        if model_id == primitive.NilObjectID {
+            instance, err := model.ModelGet[master_types.<%=permission.model%>](
+                model.NewMongoFilter(
+                    <%_ for (const key in permission.model_info??[]) {_%>
+                    <%_ if (key == 'id') {_%>
+                    model.IdFilter(<%= H.ul(permission.model_info[key]) %>),
+                    <%_ } else {_%>
+                    model.MongoKeyFilter("<%= key %>", <%= H.bc(permission.model_info[key]) %>),
+                    <%_ } _%>
+                ),
+            )
+            if err != nil {
+                return master_types.ErrorResponse(-500, err.Error())
+            }
+            if instance == nil {
+                return master_types.ErrorResponse(-404, "Not found")
+            }
+            model_id = instance.Id
+            // store instance to cache
+            service_cache["<%= permission.model %>" + model_id.Hex()] = instance
+        }
+
+        <%_ if (permission.granularity == 'user') {_%>
+        // check permission
+        permission, err := model.ModelGetAll[permission_type.<%=permission.model%>Permission](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("type", permission_type.<%=permission.model%>_PERMISSION_TYPE_USER),
+                model.MongoKeyFilter("target_id", model_id),
+                model.MongoKeyFilter("owner_id", user.Id),
+            ),
+        )
+        <%_ } else if (permission.granularity == 'group') {_%>
+        // get user's group
+        groups, err := model.ModelGetAll[master_types.GroupMember](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("uid", user.Id),
+                model.MongoNoFlagFilter(master_types.BASIC_TYPE_FLAG_DELETED),
+            ),
+        )
+        
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+        // get all group Id
+        var group_ids []master_types.PrimaryId
+        for _, group := range groups {
+            group_ids = append(group_ids, group.Id)
+        }
+
+        // check permission
+        permission, err := model.ModelGetAll[permission_type.<%=permission.model%>Permission](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("type", permission_type.<%=permission.model%>_PERMISSION_TYPE_GROUP),
+                model.MongoKeyFilter("target_id", model_id),
+                model.MongoArrayContainsFilter("owner_id", group_ids),
+            ),
+        )
+        <%_ } _%>
+
+        // check permission
+        var granularity_access_controll bool = true
+        for _, permission := range permission {
+            <%_ if (permission.granularity == 'user') {_%>
+            <%_ for (const key in permission.permission??[]) {_%>
+            <%_ if (permission.permission[key] == 'r') {_%>
+            if !permission.UserAccessRead(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } else if (permission.permission[key] == 'w') {_%>
+            if !permission.UserAccessWrite(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } else if (permission.permission[key] == 'd') {_%>
+            if !permission.UserAccessDelete(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } _%>
+            <%_ } _%>
+            <%_ } else if (permission.granularity == 'group') {_%>
+            <%_ for (const key in permission.permission??[]) {_%>
+            <%_ if (permission.permission[key] == 'r') {_%>
+            if !permission.GroupAccessRead(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } else if (permission.permission[key] == 'w') {_%>
+            if !permission.GroupAccessWrite(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } else if (permission.permission[key] == 'd') {_%>
+            if !permission.GroupAccessDelete(permission.Id) {
+                granularity_access_controll = false
+                break
+            }
+            <%_ } _%>
+            <%_ } _%>
+            <%_ } _%>
+        }
+
+        if granularity_access_controll {
+            access_controll = true
+        }
+
+    }
+
+    <%_ } %>
+    <%_ } _%>
+    <%_ } _%>
+
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+
+    <%= // do actions %>
+    <%_ for (const arg in DATA.REQ.actions??[]) {_%>
+    <%_ const action = DATA.REQ.actions[arg] _%>
+    <%_ if (action.type == 'create') {_%>
+    // create <%= action.model %>
+    var <%= H.ul(action.model) %> *master_types.<%= action.model %> = &master_types.<%= action.model %>{
+        <%_ for (const key in action.model_info??[]) {_%>
+        <%_ if (action.model_info[key] == '$time') {_%>
+        <%= H.bc(key) %>: time.Now().Unix(),
+        <%_ } else if (action.model_info[key] == '$user') {_%>
+        <%= H.bc(key) %>: user.Id,
+        <%_ } else {_%>
+        <%= H.bc(key) %>: <%= H.bc(action.model_info[key]) %>,
+        <%_ } _%>
+        <%_ } _%>
+    }
+
+    err := model.ModelInsert(<%= H.ul(action.model) %>, nil)
+    if err != nil {
+        return master_types.ErrorResponse(-500, err.Error())
+    }
+    <%_ } _%>
+    <%_ } _%>
+
+    /* @MT-TPL-SERVICE-END */
+
+    // TODO: add service code here, do what you want to do
+   
+    /* @MT-TPL-SERVICE-RESP-START */
+
+    return master_types.SuccessResponse(<%= H.u2lc(DATA.REQ.route)%>Response)
+}
+/* @MT-TPL-SERVICE-RESP-END */
