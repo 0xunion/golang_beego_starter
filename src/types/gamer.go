@@ -20,3 +20,35 @@ const (
 	GAMER_IDENTITY_JUDGEMENT
 	GAMER_IDENTITY_CUSTOMER
 )
+
+func (g *Gamer) IsAttacker() bool {
+	return g.Identity == GAMER_IDENTITY_ATTACKER
+}
+
+func (g *Gamer) IsDefender() bool {
+	return g.Identity == GAMER_IDENTITY_DEFENDER
+}
+
+func (g *Gamer) IsJudgement() bool {
+	return g.Identity == GAMER_IDENTITY_JUDGEMENT
+}
+
+func (g *Gamer) IsCustomer() bool {
+	return g.Identity == GAMER_IDENTITY_CUSTOMER
+}
+
+func (g *Gamer) SetAttacker() {
+	g.Identity = GAMER_IDENTITY_ATTACKER
+}
+
+func (g *Gamer) SetDefender() {
+	g.Identity = GAMER_IDENTITY_DEFENDER
+}
+
+func (g *Gamer) SetJudgement() {
+	g.Identity = GAMER_IDENTITY_JUDGEMENT
+}
+
+func (g *Gamer) SetCustomer() {
+	g.Identity = GAMER_IDENTITY_CUSTOMER
+}
