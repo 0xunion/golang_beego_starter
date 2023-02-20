@@ -19,6 +19,7 @@ const (
 	FILE_ROLE_BLUE_TEAM
 	FILE_ROLE_JUDGEMENT
 	FILE_ROLE_CUSTOMER
+	FILE_ROLE_PARTA
 )
 
 func (f *File) PublicAccess() bool {
@@ -41,6 +42,10 @@ func (f *File) CustomerAccess() bool {
 	return f.Role&FILE_ROLE_CUSTOMER != 0
 }
 
+func (f *File) PartAAccess() bool {
+	return f.Role&FILE_ROLE_PARTA != 0
+}
+
 func (f *File) SetPublicAccess() {
 	f.Role |= FILE_ROLE_PUBLIC
 }
@@ -59,6 +64,10 @@ func (f *File) SetJudgementAccess() {
 
 func (f *File) SetCustomerAccess() {
 	f.Role |= FILE_ROLE_CUSTOMER
+}
+
+func (f *File) SetPartAAccess() {
+	f.Role |= FILE_ROLE_PARTA
 }
 
 func (f *File) ClearPublicAccess() {
@@ -81,6 +90,10 @@ func (f *File) ClearCustomerAccess() {
 	f.Role &= ^FILE_ROLE_CUSTOMER
 }
 
+func (f *File) ClearPartAAccess() {
+	f.Role &= ^FILE_ROLE_PARTA
+}
+
 func (f *File) UserAccess(user_identity int64) bool {
 	switch user_identity {
 	case GAMER_IDENTITY_ATTACKER:
@@ -91,6 +104,8 @@ func (f *File) UserAccess(user_identity int64) bool {
 		return f.JudgementAccess()
 	case GAMER_IDENTITY_CUSTOMER:
 		return f.CustomerAccess()
+	case GAMER_IDENTITY_PARTA:
+		return f.PartAAccess()
 	}
 
 	return false

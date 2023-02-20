@@ -12,17 +12,16 @@ import (
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-SERVICE-START */
+// /api/custom/admin/game/import/defender Service
 func ApiCustomAdminGameImportDefenderService(
 	user *master_types.User,
 	GameId master_types.PrimaryId,
 	DefenderFileId master_types.PrimaryId,
 ) *master_types.MasterResponse {
 	var apiCustomAdminGameImportDefenderResponse struct {
-		Success bool `json:"success"`
+		Success bool                   `json:"success"`
+		FileId  master_types.PrimaryId `json:"file_id"`
 	}
-
-	// cache map, use to store the data that has been queried
-	service_cache := make(map[string]interface{})
 
 	access_controll := false
 	if !access_controll && user.IsAdmin() {
@@ -92,8 +91,15 @@ func ApiCustomAdminGameImportDefenderService(
 		}
 
 		// read data
+		// check if defender exists
+		for _, defender := range defenders {
+			if defender.Name == row[1] {
+				continue
+			}
+		}
+
+		// do not exist, create new defender
 		defender := master_types.Defender{
-			Uri:      row[0],
 			Name:     row[1],
 			Industry: row[2],
 			Score:    10000,
@@ -107,7 +113,40 @@ func ApiCustomAdminGameImportDefenderService(
 
 	// insert data
 	for _, defender := range defenders {
-		err := model.ModelInsert(defender, nil)
+		var id master_types.PrimaryId
+		err := model.ModelInsert(defender, &id)
+		if err != nil {
+			return master_types.ErrorResponse(-500, err.Error())
+		}
+		defender.Id = id
+	}
+
+	// insert asset
+	for _, asset := range rows {
+		// check if defender exists
+		var defender *master_types.Defender
+		for _, d := range defenders {
+			if d.Name == asset[1] {
+				defender = d
+				break
+			}
+		}
+		if defender == nil {
+			return master_types.ErrorResponse(-500, "defender not found")
+		}
+
+		// create asset
+		asset := master_types.Asset{
+			Owner:      user.Id,
+			DefenderId: defender.Id,
+			Uri:        asset[0],
+			Industry:   asset[2],
+			CreateAt:   time.Now().Unix(),
+			GameId:     GameId,
+		}
+
+		var id master_types.PrimaryId
+		err := model.ModelInsert(&asset, &id)
 		if err != nil {
 			return master_types.ErrorResponse(-500, err.Error())
 		}

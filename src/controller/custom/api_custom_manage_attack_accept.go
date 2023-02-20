@@ -9,15 +9,18 @@ import (
     master_types "github.com/0xunion/exercise_back/src/types"
     custom_service "github.com/0xunion/exercise_back/src/service/custom"
     
+
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomAdminGameCreateController struct {
+type ApiCustomManageAttackAcceptController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAdminGameCreateController) Post() {
+func (c *ApiCustomManageAttackAcceptController) Post() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -27,26 +30,35 @@ func (c *ApiCustomAdminGameCreateController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Name string `json:"name" form:"name" validate:"MinSize(3),MaxSize(64)"`
-        Description string `json:"description" form:"description" validate:"MinSize(3),MaxSize(64)"`
-        HeaderHtml string `json:"header_html" form:"header_html" validate:"MinSize(3),MaxSize(1024)"`
-        StartTime int64 `json:"start_time" form:"start_time" validate:""`
-        EndTime int64 `json:"end_time" form:"end_time" validate:""`
     }
 
 
+    request_params_game_id, err := primitive.ObjectIDFromHex(c.GetString("game_id"))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    request_params_attack_id, err := primitive.ObjectIDFromHex(c.GetString("attack_id"))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
 
     if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
     }
 
-    response := custom_service.ApiCustomAdminGameCreateService(
+    response := custom_service.ApiCustomManageAttackAcceptService(
         user,
-        request_params.Name,
-        request_params.Description,
-        request_params.HeaderHtml,
-        request_params.StartTime,
-        request_params.EndTime,
+        request_params_game_id,
+        request_params_attack_id,
     )
 /* @MT-TPL-CONTROLLER-END */
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+
+    c.Ctx.Output.JSON(response, true, false)
+}
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-END */

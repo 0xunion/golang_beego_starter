@@ -5,13 +5,13 @@
  */
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
     master_types "github.com/0xunion/exercise_back/src/types"
     model "github.com/0xunion/exercise_back/src/model"
     permission_type "github.com/0xunion/exercise_back/src/types/permission"
     "go.mongodb.org/mongo-driver/bson/primitive"
 
+/* @MT-TPL-IMPORT-TIME-START */
     <%_ let require_time = false %>
     <%_ for( const act in DATA.REQ.actions??[] ){_%>
     <%_ for( const arg in DATA.REQ.actions[act].model_info??[] ){_%>
@@ -23,10 +23,11 @@ import (
     <%_ if (require_time) {_%>
     "time"
     <%_ } _%>
+/* @MT-TPL-IMPORT-TIME-END */
 )
-/* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-SERVICE-START */
+// <%= DATA.REQ.route %> Service <%= DATA.REQ.description_cn %>
 func <%= H.u2bc(DATA.REQ.route)%>Service(
     <%_ if (DATA.REQ.require_login) {_%>
     user *master_types.User,
@@ -46,9 +47,6 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
         <%= H.bc(rep) %> <%= DATA.REQ.response[rep] %> `json:"<%= rep %>"`
         <%_ } _%>
     }
-
-    // cache map, use to store the data that has been queried
-    service_cache := make(map[string]interface{})
 
     access_controll := false
     <%_ for (const arg in DATA.REQ.permissions??[]) {_%>
@@ -178,10 +176,31 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
         if granularity_access_controll {
             access_controll = true
         }
-
     }
 
     <%_ } %>
+    <%_ } else if (DATA.REQ.permissions[arg].mode == 'model') {_%>
+    <%_ const permission = DATA.REQ.permissions[arg] _%>
+    if !access_controll {
+        model_instance, err := model.ModelGet[master_types.<%=permission.model%>](
+            model.NewMongoFilter(
+                <%_ for (const key in permission.model_info??[]) {_%>
+                <%_ if (key == 'id') {_%>
+                model.IdFilter(<%= H.ul(permission.model_info[key]) %>),
+                <%_ } else if (permission.model_info[key] == '$user') {_%>
+                model.MongoKeyFilter("<%= key %>", user.Id),
+                <%_ } else {_%>
+                model.MongoKeyFilter("<%= key %>", <%= permission.model_info[key] %>),
+                <%_ } _%>
+                <%_ } _%>
+            ),
+        )
+        if err == nil && model_instance != nil {
+            access_controll = true
+        }
+    }
+    <%_ } else if (DATA.REQ.permissions[arg].mode == 'all') {_%>
+        access_controll = true
     <%_ } _%>
     <%_ } _%>
 
@@ -200,7 +219,9 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
         <%= H.bc(key) %>: time.Now().Unix(),
         <%_ } else if (action.model_info[key] == '$user') {_%>
         <%= H.bc(key) %>: user.Id,
-        <%_ } else {_%>
+        <%_ } else if (H.is_complex_type(action.model_info[key])) {_%>
+        <%= H.bc(key) %>: <%= action.model_info[key] %>,
+        <%_ } else {_%> 
         <%= H.bc(key) %>: <%= H.bc(action.model_info[key]) %>,
         <%_ } _%>
         <%_ } _%>

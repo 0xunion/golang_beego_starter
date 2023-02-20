@@ -16,11 +16,11 @@ import (
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomAdminGameImportRedTeamController struct {
+type ApiCustomAttackerReportAppealController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAdminGameImportRedTeamController) Post() {
+func (c *ApiCustomAttackerReportAppealController) Post() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -30,6 +30,7 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
+        Reason string `json:"reason" form:"reason" validate:""`
     }
 
 
@@ -38,7 +39,7 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
     }
-    request_params_red_team_file_id, err := primitive.ObjectIDFromHex(c.GetString("red_team_file_id"))
+    request_params_report_id, err := primitive.ObjectIDFromHex(c.GetString("report_id"))
     if err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
@@ -49,9 +50,17 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
         return
     }
 
-    response := custom_service.ApiCustomAdminGameImportRedTeamService(
+    response := custom_service.ApiCustomAttackerReportAppealService(
         user,
         request_params_game_id,
-        request_params_red_team_file_id,
+        request_params_report_id,
+        request_params.Reason,
     )
 /* @MT-TPL-CONTROLLER-END */
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+
+    c.Ctx.Output.JSON(response, true, false)
+}
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-END */

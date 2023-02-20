@@ -19,6 +19,7 @@ const (
 	GAMER_IDENTITY_DEFENDER
 	GAMER_IDENTITY_JUDGEMENT
 	GAMER_IDENTITY_CUSTOMER
+	GAMER_IDENTITY_PARTA
 )
 
 func (g *Gamer) IsAttacker() bool {
@@ -37,6 +38,10 @@ func (g *Gamer) IsCustomer() bool {
 	return g.Identity == GAMER_IDENTITY_CUSTOMER
 }
 
+func (g *Gamer) IsPartA() bool {
+	return g.Identity == GAMER_IDENTITY_PARTA
+}
+
 func (g *Gamer) SetAttacker() {
 	g.Identity = GAMER_IDENTITY_ATTACKER
 }
@@ -51,4 +56,8 @@ func (g *Gamer) SetJudgement() {
 
 func (g *Gamer) SetCustomer() {
 	g.Identity = GAMER_IDENTITY_CUSTOMER
+}
+
+func (g *Gamer) SetPartA() {
+	g.Identity = GAMER_IDENTITY_PARTA
 }

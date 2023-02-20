@@ -16,11 +16,11 @@ import (
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomAdminGameImportRedTeamController struct {
+type ApiCustomAttackerReportController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAdminGameImportRedTeamController) Post() {
+func (c *ApiCustomAttackerReportController) Post() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -30,6 +30,14 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
+        Content string `json:"content" form:"content" validate:"Required,MinSize(1),MaxSize(16384)"`
+        BreakIsolation int `json:"break_isolation" form:"break_isolation" validate:""`
+        VulnType int `json:"vuln_type" form:"vuln_type" validate:""`
+        AchievementType int `json:"achievement_type" form:"achievement_type" validate:""`
+        AttackType int `json:"attack_type" form:"attack_type" validate:""`
+        Uri string `json:"uri" form:"uri" validate:""`
+        VulnLevel int `json:"vuln_level" form:"vuln_level" validate:""`
+        Name string `json:"name" form:"name" validate:""`
     }
 
 
@@ -38,7 +46,7 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
     }
-    request_params_red_team_file_id, err := primitive.ObjectIDFromHex(c.GetString("red_team_file_id"))
+    request_params_defender_id, err := primitive.ObjectIDFromHex(c.GetString("defender_id"))
     if err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
@@ -49,9 +57,24 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
         return
     }
 
-    response := custom_service.ApiCustomAdminGameImportRedTeamService(
+    response := custom_service.ApiCustomAttackerReportService(
         user,
         request_params_game_id,
-        request_params_red_team_file_id,
+        request_params_defender_id,
+        request_params.Content,
+        request_params.BreakIsolation,
+        request_params.VulnType,
+        request_params.AchievementType,
+        request_params.AttackType,
+        request_params.Uri,
+        request_params.VulnLevel,
+        request_params.Name,
     )
 /* @MT-TPL-CONTROLLER-END */
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+
+    c.Ctx.Output.JSON(response, true, false)
+}
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-END */

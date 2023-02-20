@@ -7,31 +7,35 @@ import (
 
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
+	"github.com/0xunion/exercise_back/src/util/auth"
+	"github.com/0xunion/exercise_back/src/util/hash"
+	"github.com/0xunion/exercise_back/src/util/num"
 	"github.com/xuri/excelize/v2"
 )
 
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-SERVICE-START */
+// /api/custom/admin/game/import/red_team Service 从文件导入红队信息
 func ApiCustomAdminGameImportRedTeamService(
-	user *master_types.User,
-	GameId master_types.PrimaryId,
-	RedTeamFileId master_types.PrimaryId,
-) *master_types.MasterResponse {
-	var apiCustomAdminGameImportRedTeamResponse struct {
-		Success bool `json:"success"`
-	}
+    user *master_types.User,
+    GameId master_types.PrimaryId,
+    RedTeamFileId master_types.PrimaryId,
+) (*master_types.MasterResponse) {
+    var apiCustomAdminGameImportRedTeamResponse struct {
+        Success bool `json:"success"`
+        FileId master_types.PrimaryId `json:"file_id"`
+    }
 
-	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
+    access_controll := false
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	file_id := RedTeamFileId
@@ -156,8 +160,20 @@ func ApiCustomAdminGameImportRedTeamService(
 	}
 
 	// create users
+	// create excel file to store user info
+	f.Close()
+	f = excelize.NewFile()
+
+	index, err := f.NewSheet("Sheet1")
+	headers := []string{"Username", "Password", "Team", "Phone"}
+	header_serial := []string{"A", "B", "C", "D"}
+
+	for i, header := range headers {
+		f.SetCellValue("Sheet1", header_serial[i]+"1", header)
+	}
+
 	admin := user
-	for _, user := range users {
+	for i, user := range users {
 		phone_max_length := 4
 		if len(user.Phone) < phone_max_length {
 			phone_max_length = len(user.Phone)
@@ -167,13 +183,55 @@ func ApiCustomAdminGameImportRedTeamService(
 			Parent:   admin.Id,
 		}
 
-		var id master_types.PrimaryId
-		err = model.ModelInsert(user_model, &id)
-		if err != nil {
-			return master_types.ErrorResponse(-500, err.Error())
-		}
+		clear_password := ""
 
-		user_model.Id = id
+		// check if phone already existss
+		phone, err := model.ModelGet[master_types.Phone](
+			model.NewMongoFilter(
+				model.MongoKeyFilter("phone", user.Phone),
+			),
+		)
+
+		if err != nil || phone == nil {
+			// create password
+			clear_password = user.Phone + strconv.Itoa(num.Random(1000, 9999))
+			password := &master_types.Password{
+				Uid:      user_model.Id,
+				Password: auth.HashPassword(hash.Md5(clear_password)),
+				CreateAt: time.Now().Unix(),
+			}
+
+			err = model.ModelInsert(password, nil)
+			if err != nil {
+				return master_types.ErrorResponse(-500, err.Error())
+			}
+
+			// create phone
+			phone := &master_types.Phone{
+				Uid:      user_model.Id,
+				Phone:    user.Phone,
+				CreateAt: time.Now().Unix(),
+			}
+
+			err = model.ModelInsert(phone, nil)
+			if err != nil {
+				return master_types.ErrorResponse(-500, err.Error())
+			}
+
+			// create user
+			var uid master_types.PrimaryId
+			if err = model.ModelInsert(user_model, &uid); err != nil {
+				return master_types.ErrorResponse(-500, err.Error())
+			}
+
+			user_model.Id = uid
+		} else {
+			if phone == nil {
+				return master_types.ErrorResponse(-500, "phone is nil")
+			}
+			clear_password = "用户已存在，密码需自行回忆，平台不会储存任何明文密码"
+			user_model.Id = phone.Uid
+		}
 
 		// add user to group
 		group := groups[user.TeamId]
@@ -205,11 +263,45 @@ func ApiCustomAdminGameImportRedTeamService(
 		if err != nil {
 			return master_types.ErrorResponse(-500, err.Error())
 		}
+
+		// add user to excel file
+		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i+2), user_model.Username)
+		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i+2), clear_password)
+		f.SetCellValue("Sheet1", "C"+strconv.Itoa(i+2), team_names[user.TeamId])
+		f.SetCellValue("Sheet1", "D"+strconv.Itoa(i+2), user.Phone)
 	}
 
+	f.SetActiveSheet(index)
+	// Save file
+	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
+	date := time.Now().Format("2006-01-02")
+	file_path = "generate/" + date + "/" + random_hash
+
+	err = f.SaveAs(file_path)
+	if err != nil {
+		return master_types.ErrorResponse(-500, err.Error())
+	}
+
+	out_file := &master_types.File{
+		Owner:    user.Id,
+		Path:     file_path,
+		GameId:   GameId,
+		CreateAt: time.Now().Unix(),
+		Hash:     random_hash,
+		Size:     0,
+	}
+
+	var id master_types.PrimaryId
+	err = model.ModelInsert(out_file, &id)
+
+	if err != nil {
+		return master_types.ErrorResponse(-500, err.Error())
+	}
+
+	apiCustomAdminGameImportRedTeamResponse.FileId = id
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAdminGameImportRedTeamResponse)
+    return master_types.SuccessResponse(apiCustomAdminGameImportRedTeamResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */

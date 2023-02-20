@@ -60,6 +60,7 @@ func AttackerCreateFileService(user *types.User, file multipart.File, header *mu
 	}
 
 	file_obj.SetJudgementAccess()
+	file_obj.SetPartAAccess()
 
 	var id types.PrimaryId
 	err = model.ModelInsert(file_obj, &id)

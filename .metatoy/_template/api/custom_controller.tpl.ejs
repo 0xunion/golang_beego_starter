@@ -86,7 +86,12 @@ func (c *<%= H.u2bc(DATA.REQ.route)%>Controller) <%= H.bc(H.custom_method(DATA.R
         <%_ } _%> 
         <%_ } _%>
     )
+
+    /* @MT-TPL-CONTROLLER-END */
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+
     c.Ctx.Output.JSON(response, true, false)
 }
 
-/* @MT-TPL-CONTROLLER-END */
+/* @MT-TPL-CONTROLLER-RESPONSE-END */

@@ -87,18 +87,16 @@
         ],
         "response" : {
             "success" : "bool"
-        }
+        },
+        "description" : "create a game",
+        "description_cn" : "创建一个比赛"
     },
     {
-        "route" : "/api/custom/admin/game/import/defender",
-        "method" : "post",
+        "route" : "/api/custom/admin/game/template/red_team",
+        "method" : "get",
         "args" : {
             "game_id" : {
-                "type" : "master_type.PrimaryId",
-                "validate" : {}
-            },
-            "defender_file_id" : {
-                "type" : "master_type.PrimaryId",
+                "type" : "master_types.PrimaryId",
                 "validate" : {}
             }
         },
@@ -115,7 +113,40 @@
 
         ],
         "response" : {
-            "success" : "bool"
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate red team template excel file",
+        "description_cn" : "生成红队模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/defender",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "defender_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
         },
         "description" : "import defender from file"
     },
@@ -124,11 +155,11 @@
         "method" : "post",
         "args" : {
             "game_id" : {
-                "type" : "master_type.PrimaryId",
+                "type" : "master_types.PrimaryId",
                 "validate" : {}
             },
             "red_team_file_id" : {
-                "type" : "master_type.PrimaryId",
+                "type" : "master_types.PrimaryId",
                 "validate" : {}
             }
         },
@@ -145,8 +176,1124 @@
 
         ],
         "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "import red team from file",
+        "description_cn" : "从文件导入红队信息"
+    },
+    {
+        "route" : "/api/custom/admin/game/template/defender",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate defender template excel file",
+        "description_cn" : "生成防守方人员模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/template/blue_team",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate blue team template excel file",
+        "description_cn" : "生成蓝队模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/blue_team",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "blue_team_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "import blue team from file",
+        "description_cn" : "从文件导入蓝队信息，文件格式参考蓝队模板"
+    },
+    {
+        "route" : "api/custom/admin/game/template/judge",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "judge_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate judge template excel file",
+        "description_cn" : "生成裁判模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/judge",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "judge_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "import judge from file",
+        "description_cn" : "从文件导入裁判信息，文件格式参考裁判模板"
+    },
+    {
+        "route" : "/api/custom/admin/game/template/leader",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate leader template excel file",
+        "description_cn" : "生成领导模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/leader",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "leader_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "import leader from file",
+        "description_cn" : "从文件导入领导信息，文件格式参考领导模板"
+    },
+    {
+        "route" : "/api/custom/admin/game/template/part_a",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "generate part_a template excel file",
+        "description_cn" : "生成甲方模板文件"
+    },
+    {
+        "route" : "/api/custom/admin/game/import/part_a",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "part_a_file_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "file_id" : "master_types.PrimaryId"
+        },
+        "description" : "import part_a from file",
+        "description_cn" : "从文件导入甲方信息，文件格式参考甲方模板"
+    },
+    {
+        "route" : "/api/custom/manage/rank",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "page" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "page_size" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "rank" : "any",
+            "total" : "int"
+        },
+        "description" : "get rank",
+        "description_cn" : "后台获取排名"
+    },
+    {
+        "route" : "/api/custom/manage/report/list",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "page" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "page_size" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "order" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "reports" : "any",
+            "total" : "int"
+        },
+        "description" : "get report list",
+        "description_cn" : "获取红队提交的报告列表"
+    },
+    {
+        "route" : "/api/custom/manage/report/accept",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "score" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
             "success" : "bool"
         },
-        "description" : "import red team from file"
+        "description" : "commit report",
+        "description_cn" : "为红队提交的报告打分"
+    },
+    {
+        "route" : "/api/custom/manage/report/reject",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "comment" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "reject report",
+        "description_cn" : "驳回红队提交的报告"
+    },
+    {
+        "route" : "/api/custom/manage/report/comment",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "comment" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "comment report",
+        "description_cn" : "评论红队提交的报告"
+    },
+    {
+        "route" : "/api/custom/manage/attack/accept",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "attack_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "accept attack",
+        "description_cn" : "接受红队的攻击"
+    },
+    {
+        "route" : "/api/custom/manage/attack/reject",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "attack_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "comment" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a judge of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "reject attack",
+        "description_cn" : "驳回红队的攻击"
+    },
+    {
+        "route" : "/api/custom/attacker/list_defender",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "defenders" : "any"
+        },
+        "description" : "get defender list",
+        "description_cn" : "获取防守方列表"
+    },
+    {
+        "route" : "/api/custom/attacker/report_section",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "sections" : "any"
+        },
+        "description" : "get report section",
+        "description_cn" : "获取报告中各种类型的允许范围，如漏洞类型，攻击手法类型等"
+    },
+    {
+        "route" : "/api/custom/attacker/report",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "defender_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "content" : {
+                "type" : "string",
+                "validate" : {
+                    "required" : true,
+                    "min" : 1,
+                    "max" : 16384 // 16k, if this is not enough... fuck you
+                }
+            },
+            "break_isolation" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "vuln_type" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "achievement_type" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "attack_type" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "uri" : {
+                "type" : "string",
+                "validate" : {}
+            },
+            "vuln_level" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "name" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "create",
+                "model" : "Report",
+            }
+        ],
+        "response" : {
+            "success" : "bool",
+            "report_id" : "any"
+        },
+        "description" : "submit report",
+        "description_cn" : "提交报告"
+    },
+    {
+        "route" : "/api/custom/attacker/attack/section",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "sections" : "any"
+        },
+        "description" : "get attack section",
+        "description_cn" : "获取攻击申请中的状态对照表，如0-未审核，1-已通过等"
+    },
+    {
+        "route" : "/api/custom/attacker/attack/apply",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "defender_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "reason" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "create",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "reason" : "Reason",
+                    "defender" : "DefenderId",
+                    "create_at" : "$time",
+                    "state" : "master_types.ATTACK_STATE_UNVERIFIED"
+                }
+            }
+        ],
+        "response" : {
+            "success" : "bool",
+            "attack_id" : "any"
+        },
+        "description" : "apply attack",
+        "description_cn" : "申请高危攻击"
+    },
+    {
+        "route" : "/api/custom/attacker/attack/list",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "page" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "page_size" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "attacks" : "any"
+        },
+        "description" : "get attack list",
+        "description_cn" : "获取攻击申请列表"
+    },
+    {
+        "route" : "/api/custom/attacker/attack/detail",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "attack_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "attack" : "any"
+        },
+        "description" : "get attack detail",
+        "description_cn" : "获取攻击申请详情"
+    },
+    {
+        "route" : "/api/custom/attacker/report/list",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "page" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "page_size" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+            
+        ],
+        "response" : {
+            "success" : "bool",
+            "reports" : "any"
+        },
+        "description" : "get report list",
+        "description_cn" : "获取攻击报告列表"
+    },
+    {
+        "route" : "/api/custom/attacker/report/detail",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool",
+            "report" : "any"
+        },
+        "description" : "get report detail",
+        "description_cn" : "获取攻击报告详情"
+    },
+    {
+        "route" : "/api/custom/attacker/report/delete",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "delete report",
+        "description_cn" : "删除攻击报告"
+    },
+    {
+        "route" : "/api/custom/attacker/report/appeal",
+        "method" : "post",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "reason" : {
+                "type" : "string",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            // check if user is a attacker of the game
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "mode" : "model",
+                "model" : "ReportComment",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "report_id" : "ReportId",
+                    "owner" : "$user",
+                    "content" : "Reason",
+                    "create_at" : "$time"
+                }
+            }
+        ],
+        "response" : {
+            "success" : "bool"
+        },
+        "description" : "appeal report",
+        "description_cn" : "申诉攻击报告"
     }
 ]

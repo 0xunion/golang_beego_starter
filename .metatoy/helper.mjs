@@ -82,13 +82,17 @@ export class Helper {
 
     is_array_type( type )
     {
-        console.log('xxx' + type)
         return type.startsWith('[]');
     }
 
     is_id_type( type )
     {
         return type.indexOf('PrimaryId') != -1;
+    }
+
+    is_complex_type( type )
+    {
+        return type.indexOf('master_types') != -1;
     }
 
     beego_validate( type, rules ) 
