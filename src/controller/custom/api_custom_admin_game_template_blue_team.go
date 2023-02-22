@@ -47,12 +47,11 @@ func (c *ApiCustomAdminGameTemplateBlueTeamController) Get() {
         user,
         request_params_game_id,
     )
-
-    /* @MT-TPL-CONTROLLER-END */
+/* @MT-TPL-CONTROLLER-END */
 
     /* @MT-TPL-CONTROLLER-RESPONSE-START */
 
     c.Ctx.Output.JSON(response, true, false)
 }
 
-/* @MT-TPL-CONTROLLER-RESPONSE-END */
+    /* @MT-TPL-CONTROLLER-RESPONSE-END */

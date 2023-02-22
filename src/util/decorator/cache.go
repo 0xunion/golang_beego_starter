@@ -86,18 +86,18 @@ func init() {
 	routine.Info("[Cache] Start init redis")
 	reconnectRedis()
 	// launch a goroutine to monitor redis connection
-	routine.Go("redis_monitor", func() {
-		routine.Info("[Cache] Start monitor redis connection")
-		for {
-			_, err := defaultCache.(*RedisCache).Handle.Ping(defaultCache.(*RedisCache).Handle.Context()).Result()
-			if err != nil {
-				routine.Error("[Cachce] redis connection failed, err: %v", err)
-				defaultCache.(*RedisCache).Alive = false
-				reconnectRedis()
-			}
-			time.Sleep(time.Second * 5)
-		}
-	})
+	// routine.Go("redis_monitor", func() {
+	// 	routine.Info("[Cache] Start monitor redis connection")
+	// 	for {
+	// 		_, err := defaultCache.(*RedisCache).Handle.Ping(defaultCache.(*RedisCache).Handle.Context()).Result()
+	// 		if err != nil {
+	// 			routine.Error("[Cachce] redis connection failed, err: %v", err)
+	// 			defaultCache.(*RedisCache).Alive = false
+	// 			reconnectRedis()
+	// 		}
+	// 		time.Sleep(time.Second * 5)
+	// 	}
+	// })
 }
 
 func WithCacheGet[T any](fn func(key string) (T, error), key string) (T, error) {

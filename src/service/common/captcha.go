@@ -62,6 +62,7 @@ func (c *Captcha) Try(ans string) bool {
 	defer try_locker.Unlock()
 	times, err := cache.GetCache[int](c.Id, "captcha", "try_times")
 	if err != nil {
+		times = new(int)
 		*times = 0
 	}
 	*times++

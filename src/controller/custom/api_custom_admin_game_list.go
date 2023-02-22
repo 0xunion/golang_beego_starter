@@ -13,11 +13,11 @@ import (
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomAdminGameCreateController struct {
+type ApiCustomAdminGameListController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAdminGameCreateController) Post() {
+func (c *ApiCustomAdminGameListController) Get() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -27,11 +27,8 @@ func (c *ApiCustomAdminGameCreateController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Name string `json:"name" form:"name" valid:"MinSize(3);MaxSize(64);Required"`
-        Description string `json:"description" form:"description" valid:"MinSize(3);MaxSize(64);Required"`
-        HeaderHtml string `json:"header_html" form:"header_html" valid:"MinSize(3);MaxSize(1024);Required"`
-        StartTime int64 `json:"start_time" form:"start_time" valid:"Required"`
-        EndTime int64 `json:"end_time" form:"end_time" valid:"Required"`
+        Page int64 `json:"page" form:"page" valid:"Min(1);Required"`
+        PageSize int64 `json:"page_size" form:"page_size" valid:"Min(1);Max(100);Required"`
     }
 
 
@@ -41,15 +38,16 @@ func (c *ApiCustomAdminGameCreateController) Post() {
         return
     }
 
-    response := custom_service.ApiCustomAdminGameCreateService(
+    response := custom_service.ApiCustomAdminGameListService(
         user,
-        request_params.Name,
-        request_params.Description,
-        request_params.HeaderHtml,
-        request_params.StartTime,
-        request_params.EndTime,
+        request_params.Page,
+        request_params.PageSize,
     )
 /* @MT-TPL-CONTROLLER-END */
 
-	c.Ctx.Output.JSON(response, true, false)
+	/* @MT-TPL-CONTROLLER-RESPONSE-START */
+
+    c.Ctx.Output.JSON(response, true, false)
 }
+
+    /* @MT-TPL-CONTROLLER-RESPONSE-END */

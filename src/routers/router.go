@@ -49,7 +49,7 @@ func init() {
 					return *v, nil
 				}, uid.Hex())
 				if err == nil {
-					ctx.Input.SetData("user", user)
+					ctx.Input.SetData("user", &user)
 				}
 			}
 		}
@@ -58,4 +58,5 @@ func init() {
 	registerCURDApi()
 	registerCommon()
 	registerProd()
+	registerCustom()
 }

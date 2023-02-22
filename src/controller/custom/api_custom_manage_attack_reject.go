@@ -30,7 +30,7 @@ func (c *ApiCustomManageAttackRejectController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Comment string `json:"comment" form:"comment" validate:""`
+        Comment string `json:"comment" form:"comment" valid:"Required"`
     }
 
 

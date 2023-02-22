@@ -30,7 +30,7 @@ func (c *ApiCustomManageReportAcceptController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Score int `json:"score" form:"score" validate:""`
+        Score int `json:"score" form:"score" valid:"Required"`
     }
 
 

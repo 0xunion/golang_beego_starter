@@ -30,7 +30,7 @@ func (c *ApiCustomAttackerAttackApplyController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Reason string `json:"reason" form:"reason" validate:""`
+        Reason string `json:"reason" form:"reason" valid:"Required"`
     }
 
 

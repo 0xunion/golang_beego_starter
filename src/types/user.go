@@ -35,11 +35,9 @@ func CreateUserWithPhoneMutexEnd() {
 
 const (
 	USER_FLAG_ADMIN = 1 << 0
+	USER_FLAG_ROOT  = 1 << 1 // super admin, can do anything, only one user can be root
 
 	/* @MT-TPL-PERMISSION-START */
-	USER_MODEL_PERMISSION_WebFinger = 1 << 2
-	USER_MODEL_PERMISSION_Dir       = 1 << 1
-	USER_MODEL_PERMISSION_Cdn       = 1 << 0
 	/* @MT-TPL-PERMISSION-END */
 
 	USER_DEFAULT_FLAG             = 0
@@ -47,18 +45,9 @@ const (
 )
 
 func (u *User) IsAdmin() bool {
-	return u.UserFlag&USER_FLAG_ADMIN == USER_FLAG_ADMIN
+	return (u.UserFlag&USER_FLAG_ADMIN == USER_FLAG_ADMIN) || (u.UserFlag&USER_FLAG_ROOT == USER_FLAG_ROOT)
 }
 
 /* @MT-TPL-PERMISSION-FUNC-START */
-func (u *User) AllowManageWebFinger() bool {
-	return u.ModelPermission&USER_MODEL_PERMISSION_WebFinger == USER_MODEL_PERMISSION_WebFinger
-}
-func (u *User) AllowManageDir() bool {
-	return u.ModelPermission&USER_MODEL_PERMISSION_Dir == USER_MODEL_PERMISSION_Dir
-}
-func (u *User) AllowManageCdn() bool {
-	return u.ModelPermission&USER_MODEL_PERMISSION_Cdn == USER_MODEL_PERMISSION_Cdn
-}
 
 /* @MT-TPL-PERMISSION-FUNC-END */

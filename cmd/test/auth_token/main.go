@@ -18,9 +18,9 @@ func main() {
 		Captcha: "123456",
 	})
 
-	token_string := first_token.GenerateToken(3600)
+	token_string := first_token.GenerateToken(222)
 
 	second_token := auth.NewAuthTokenFromToken[LoginEmail](token_string)
-	fmt.Println(second_token.Check(time.Now().Unix() + 3601))
+	fmt.Println(second_token.Check(time.Now().Unix() + 1))
 	fmt.Println(second_token.Info())
 }

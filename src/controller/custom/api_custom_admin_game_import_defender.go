@@ -55,3 +55,6 @@ func (c *ApiCustomAdminGameImportDefenderController) Post() {
         request_params_defender_file_id,
     )
 /* @MT-TPL-CONTROLLER-END */
+
+	c.Ctx.Output.JSON(response, true, false)
+}

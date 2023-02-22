@@ -30,14 +30,14 @@ func (c *ApiCustomAttackerReportController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Content string `json:"content" form:"content" validate:"Required,MinSize(1),MaxSize(16384)"`
-        BreakIsolation int `json:"break_isolation" form:"break_isolation" validate:""`
-        VulnType int `json:"vuln_type" form:"vuln_type" validate:""`
-        AchievementType int `json:"achievement_type" form:"achievement_type" validate:""`
-        AttackType int `json:"attack_type" form:"attack_type" validate:""`
-        Uri string `json:"uri" form:"uri" validate:""`
-        VulnLevel int `json:"vuln_level" form:"vuln_level" validate:""`
-        Name string `json:"name" form:"name" validate:""`
+        Content string `json:"content" form:"content" valid:"Required;MinSize(1);MaxSize(16384)"`
+        BreakIsolation int `json:"break_isolation" form:"break_isolation" valid:"Required"`
+        VulnType int `json:"vuln_type" form:"vuln_type" valid:"Required"`
+        AchievementType int `json:"achievement_type" form:"achievement_type" valid:"Required"`
+        AttackType int `json:"attack_type" form:"attack_type" valid:"Required"`
+        Uri string `json:"uri" form:"uri" valid:"Required"`
+        VulnLevel int `json:"vuln_level" form:"vuln_level" valid:"Required"`
+        Name string `json:"name" form:"name" valid:"Required"`
     }
 
 

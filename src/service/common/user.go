@@ -144,7 +144,7 @@ func UserLoginByEmailAndPasswordService(email, password, captcha_token, captcha 
 	// get captcha
 	captcha_obj := captcha_token_obj.Info()
 	if !captcha_obj.Try(captcha) {
-		return types.ErrorResponse(-3001, "captcha is invalid")
+		return types.ErrorResponse(-3001, "captcha is wrong")
 	}
 
 	// hash password
@@ -198,7 +198,7 @@ func UserLoginByPhoneAndPasswordService(phone, password, captcha_token, captcha 
 	// get captcha
 	captcha_obj := captcha_token_obj.Info()
 	if !captcha_obj.Try(captcha) {
-		return types.ErrorResponse(-3001, "captcha is invalid")
+		return types.ErrorResponse(-3002, "captcha is invalid")
 	}
 
 	// hash password
@@ -240,4 +240,51 @@ func UserLoginByPhoneAndPasswordService(phone, password, captcha_token, captcha 
 	return types.SuccessResponse(map[string]string{
 		"token": login_token,
 	})
+}
+
+func InitRootUserService(email string, password string) *types.MasterResponse {
+	// check if root user exists
+	if _, err := model.ModelGet[types.User](model.NewMongoFilter(
+		model.MongoHasBitFilter("user_flag", types.USER_FLAG_ROOT),
+	)); err == nil {
+		return types.ErrorResponse(-1002, "root user already exists")
+	}
+
+	// create root user
+	hash_password := auth.HashPassword(password)
+
+	new_user := &types.User{
+		UserFlag:        types.USER_FLAG_ROOT,
+		ModelPermission: types.USER_DEFAULT_MODEL_PERMISSION,
+		Username:        "root",
+		Avatar:          "",
+	}
+
+	// create user
+	var uid types.PrimaryId
+	if err := model.ModelInsert(new_user, &uid); err != nil {
+		return types.ErrorResponse(-1001, "create user failed")
+	}
+
+	new_user.Id = uid
+
+	// create user password
+	if err := model.ModelInsert(&types.Password{
+		Uid:      uid,
+		Password: hash_password,
+		CreateAt: time.Now().Unix(),
+	}, nil); err != nil {
+		return types.ErrorResponse(-1004, "create user failed")
+	}
+
+	// create user email
+	if err := model.ModelInsert(&types.Email{
+		Uid:      uid,
+		Email:    email,
+		CreateAt: time.Now().Unix(),
+	}, nil); err != nil {
+		return types.ErrorResponse(-1004, "create user failed")
+	}
+
+	return types.SuccessResponse(new_user)
 }

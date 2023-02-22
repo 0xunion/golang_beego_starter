@@ -95,8 +95,10 @@ func (t *AuthToken[T]) GenerateToken(expire int64) string {
 	t_json, _ := json.Marshal(t.info)
 	token := random_key + ":" + t.enc(string(t_json), real_key) + ":" + strconv.FormatInt(t.expire, 10)
 	// token = BASE64(token : md5(token + k))
+
 	token = token + ":" + md5hash(token+auth_token_key)
 	token = base64.StdEncoding.EncodeToString([]byte(token))
+
 	t.token = token
 	return t.token
 }
@@ -132,7 +134,6 @@ func (t *AuthToken[T]) Check(current int64) bool {
 	if current > expire {
 		return false
 	}
-
 	// check info
 	info := t.dec(tokens[1], real_key)
 	if err := json.Unmarshal([]byte(info), &t.info); err != nil {

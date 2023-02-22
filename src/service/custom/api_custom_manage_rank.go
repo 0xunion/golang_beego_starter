@@ -2,13 +2,10 @@ package custom
 
 /* @MT-TPL-IMPORT-START */
 import (
-    master_types "github.com/0xunion/exercise_back/src/types"
-    model "github.com/0xunion/exercise_back/src/model"
-    permission_type "github.com/0xunion/exercise_back/src/types/permission"
-    "go.mongodb.org/mongo-driver/bson/primitive"
-
-
+	model "github.com/0xunion/exercise_back/src/model"
+	master_types "github.com/0xunion/exercise_back/src/types"
 )
+
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-SERVICE-START */

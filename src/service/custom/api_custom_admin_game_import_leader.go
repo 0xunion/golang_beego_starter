@@ -18,24 +18,24 @@ import (
 /* @MT-TPL-SERVICE-START */
 // /api/custom/admin/game/import/leader Service 从文件导入领导信息，文件格式参考领导模板
 func ApiCustomAdminGameImportLeaderService(
-	user *master_types.User,
-	GameId master_types.PrimaryId,
-	LeaderFileId master_types.PrimaryId,
-) *master_types.MasterResponse {
-	var apiCustomAdminGameImportLeaderResponse struct {
-		Success bool                   `json:"success"`
-		FileId  master_types.PrimaryId `json:"file_id"`
-	}
+    user *master_types.User,
+    GameId master_types.PrimaryId,
+    LeaderFileId master_types.PrimaryId,
+) (*master_types.MasterResponse) {
+    var apiCustomAdminGameImportLeaderResponse struct {
+        Success bool `json:"success"`
+        FileId master_types.PrimaryId `json:"file_id"`
+    }
 
-	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
+    access_controll := false
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	file_id := LeaderFileId
@@ -225,7 +225,7 @@ func ApiCustomAdminGameImportLeaderService(
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAdminGameImportLeaderResponse)
+    return master_types.SuccessResponse(apiCustomAdminGameImportLeaderResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */

@@ -55,3 +55,6 @@ func (c *ApiCustomAdminGameImportRedTeamController) Post() {
         request_params_red_team_file_id,
     )
 /* @MT-TPL-CONTROLLER-END */
+
+	c.Ctx.Output.JSON(response, true, false)
+}

@@ -17,23 +17,23 @@ import (
 /* @MT-TPL-SERVICE-START */
 // /api/custom/admin/game/template/defender Service 生成防守方人员模板文件
 func ApiCustomAdminGameTemplateDefenderService(
-	user *master_types.User,
-	GameId master_types.PrimaryId,
-) *master_types.MasterResponse {
-	var apiCustomAdminGameTemplateDefenderResponse struct {
-		Success bool                   `json:"success"`
-		FileId  master_types.PrimaryId `json:"file_id"`
-	}
+    user *master_types.User,
+    GameId master_types.PrimaryId,
+) (*master_types.MasterResponse) {
+    var apiCustomAdminGameTemplateDefenderResponse struct {
+        Success bool `json:"success"`
+        FileId master_types.PrimaryId `json:"file_id"`
+    }
 
-	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
+    access_controll := false
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	f := excelize.NewFile()
@@ -97,7 +97,7 @@ func ApiCustomAdminGameTemplateDefenderService(
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAdminGameTemplateDefenderResponse)
+    return master_types.SuccessResponse(apiCustomAdminGameTemplateDefenderResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */
