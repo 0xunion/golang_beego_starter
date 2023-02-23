@@ -58,6 +58,10 @@ func ApiCustomAdminGameTemplateBlueTeamService(
 		),
 	)
 
+	if err != nil {
+		return master_types.ErrorResponse(-500, err.Error())
+	}
+
 	// write exisitng defenders
 	for i, v := range defenders {
 		f.SetCellValue("Sheet1", header_serial[0]+strconv.Itoa(i+2), "13800138000")
