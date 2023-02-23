@@ -318,13 +318,9 @@
     },
     {
         "route" : "api/custom/admin/game/template/judge",
-        "method" : "post",
+        "method" : "get",
         "args" : {
             "game_id" : {
-                "type" : "master_types.PrimaryId",
-                "validate" : {}
-            },
-            "judge_file_id" : {
                 "type" : "master_types.PrimaryId",
                 "validate" : {}
             }

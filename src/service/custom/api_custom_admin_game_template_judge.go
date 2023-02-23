@@ -20,7 +20,6 @@ import (
 func ApiCustomAdminGameTemplateJudgeService(
     user *master_types.User,
     GameId master_types.PrimaryId,
-    JudgeFileId master_types.PrimaryId,
 ) (*master_types.MasterResponse) {
     var apiCustomAdminGameTemplateJudgeResponse struct {
         Success bool `json:"success"`

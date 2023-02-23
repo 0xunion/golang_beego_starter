@@ -43,12 +43,17 @@ func registerCommon() {
 	beego.Router("/api/common/auth/group/user/create/excel", &common.CreateUserInGroupByExcelController{})
 	beego.Router("/api/common/auth/group/user/permission/update", &common.UpdateGroupMemberRoleController{})
 	beego.Router("/api/common/auth/group/user/delete", &common.DeleteGroupMemberController{})
+
+	// file
+	beego.Router("/api/common/attacker/file/upload", &common.AttackerCreateFileController{})
+	beego.Router("/api/common/admin/file/upload", &common.AdminUploadFileController{})
+	beego.Router("/api/common/file/download", &common.GetFileController{})
 }
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
-    beego.Router("/api/custom/admin/game/list", &custom.ApiCustomAdminGameListController{})
-    beego.Router("/api/custom/attacker/report/appeal", &custom.ApiCustomAttackerReportAppealController{})
+	beego.Router("/api/custom/admin/game/list", &custom.ApiCustomAdminGameListController{})
+	beego.Router("/api/custom/attacker/report/appeal", &custom.ApiCustomAttackerReportAppealController{})
 	beego.Router("/api/custom/attacker/report/delete", &custom.ApiCustomAttackerReportDeleteController{})
 	beego.Router("/api/custom/attacker/report/detail", &custom.ApiCustomAttackerReportDetailController{})
 	beego.Router("/api/custom/attacker/report/list", &custom.ApiCustomAttackerReportListController{})
@@ -70,7 +75,7 @@ func registerCustom() {
 	beego.Router("/api/custom/admin/game/import/leader", &custom.ApiCustomAdminGameImportLeaderController{})
 	beego.Router("/api/custom/admin/game/template/leader", &custom.ApiCustomAdminGameTemplateLeaderController{})
 	beego.Router("/api/custom/admin/game/import/judge", &custom.ApiCustomAdminGameImportJudgeController{})
-	beego.Router("api/custom/admin/game/template/judge", &custom.ApiCustomAdminGameTemplateJudgeController{})
+	beego.Router("/api/custom/admin/game/template/judge", &custom.ApiCustomAdminGameTemplateJudgeController{})
 	beego.Router("/api/custom/admin/game/import/blue_team", &custom.ApiCustomAdminGameImportBlueTeamController{})
 	beego.Router("/api/custom/admin/game/template/blue_team", &custom.ApiCustomAdminGameTemplateBlueTeamController{})
 	beego.Router("/api/custom/admin/game/template/defender", &custom.ApiCustomAdminGameTemplateDefenderController{})
@@ -78,5 +83,5 @@ func registerCustom() {
 	beego.Router("/api/custom/admin/game/import/defender", &custom.ApiCustomAdminGameImportDefenderController{})
 	beego.Router("/api/custom/admin/game/template/red_team", &custom.ApiCustomAdminGameTemplateRedTeamController{})
 	beego.Router("/api/custom/admin/game/create", &custom.ApiCustomAdminGameCreateController{})
-    /* @MT-TPL-ROUTE-CUSTOM-END */
+	/* @MT-TPL-ROUTE-CUSTOM-END */
 }

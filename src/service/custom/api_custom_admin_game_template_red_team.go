@@ -10,28 +10,29 @@ import (
 	"github.com/0xunion/exercise_back/src/util/hash"
 	"github.com/0xunion/exercise_back/src/util/num"
 	"github.com/xuri/excelize/v2"
-	/* @MT-TPL-IMPORT-TIME-START */ /* @MT-TPL-IMPORT-TIME-END */)
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
 // /api/custom/admin/game/template/red_team Service 生成红队模板文件
 func ApiCustomAdminGameTemplateRedTeamService(
-	user *master_types.User,
-	GameId master_types.PrimaryId,
-) *master_types.MasterResponse {
-	var apiCustomAdminGameTemplateRedTeamResponse struct {
-		Success bool                   `json:"success"`
-		FileId  master_types.PrimaryId `json:"file_id"`
-	}
+    user *master_types.User,
+    GameId master_types.PrimaryId,
+) (*master_types.MasterResponse) {
+    var apiCustomAdminGameTemplateRedTeamResponse struct {
+        Success bool `json:"success"`
+        FileId master_types.PrimaryId `json:"file_id"`
+    }
 
-	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
+    access_controll := false
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	f := excelize.NewFile()
@@ -89,7 +90,7 @@ func ApiCustomAdminGameTemplateRedTeamService(
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAdminGameTemplateRedTeamResponse)
+    return master_types.SuccessResponse(apiCustomAdminGameTemplateRedTeamResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */

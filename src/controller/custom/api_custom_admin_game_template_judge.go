@@ -10,7 +10,6 @@ import (
     custom_service "github.com/0xunion/exercise_back/src/service/custom"
     
 
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 /* @MT-TPL-IMPORT-END */
@@ -20,7 +19,7 @@ type ApiCustomAdminGameTemplateJudgeController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAdminGameTemplateJudgeController) Post() {
+func (c *ApiCustomAdminGameTemplateJudgeController) Get() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -38,11 +37,6 @@ func (c *ApiCustomAdminGameTemplateJudgeController) Post() {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
     }
-    request_params_judge_file_id, err := primitive.ObjectIDFromHex(c.GetString("judge_file_id"))
-    if err != nil {
-        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
-        return
-    }
 
     if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
@@ -52,7 +46,6 @@ func (c *ApiCustomAdminGameTemplateJudgeController) Post() {
     response := custom_service.ApiCustomAdminGameTemplateJudgeService(
         user,
         request_params_game_id,
-        request_params_judge_file_id,
     )
 /* @MT-TPL-CONTROLLER-END */
 

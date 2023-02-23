@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path"
 	"strconv"
 	"time"
 
@@ -48,7 +49,7 @@ func AttackerCreateFileService(user *types.User, file multipart.File, header *mu
 	// save file
 	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
 	date := time.Now().Format("2006-01-02")
-	file_path := "storage/upload/" + date + "/" + random_hash
+	file_path := "storage/upload/" + date + "/" + random_hash + path.Ext(header.Filename)
 
 	file_obj := &types.File{
 		Owner:    user.Id,
@@ -69,6 +70,59 @@ func AttackerCreateFileService(user *types.User, file multipart.File, header *mu
 	}
 
 	// copy to disk
+	os.MkdirAll("storage/upload/"+date+"/", 0777)
+	// open file
+	file_disk, err := os.OpenFile(file_path, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return types.ErrorResponse(-500, err.Error())
+	}
+	defer file_disk.Close()
+
+	// copy
+	_, err = io.Copy(file_disk, file)
+	if err != nil {
+		return types.ErrorResponse(-500, err.Error())
+	}
+
+	return types.SuccessResponse(id)
+}
+
+func AdminUploadFileService(user *types.User, file multipart.File, header *multipart.FileHeader, game_id types.PrimaryId) *types.MasterResponse {
+	// check size
+	if header.Size > 1024*1024*40 {
+		return types.ErrorResponse(-400, "file size too large")
+	}
+
+	if !user.IsAdmin() {
+		return types.ErrorResponse(-500, "permission denied")
+	}
+
+	// save file
+	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
+	date := time.Now().Format("2006-01-02")
+
+	file_path := "storage/upload/" + date + "/" + random_hash + path.Ext(header.Filename)
+
+	file_obj := &types.File{
+		Owner:    user.Id,
+		Hash:     random_hash,
+		Size:     header.Size,
+		Path:     file_path,
+		GameId:   game_id,
+		CreateAt: time.Now().Unix(),
+	}
+
+	file_obj.SetJudgementAccess()
+	file_obj.SetPartAAccess()
+
+	var id types.PrimaryId
+	err := model.ModelInsert(file_obj, &id)
+	if err != nil {
+		return types.ErrorResponse(-500, err.Error())
+	}
+
+	// copy to disk
+	os.MkdirAll("storage/upload/"+date+"/", 0777)
 	// open file
 	file_disk, err := os.OpenFile(file_path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {

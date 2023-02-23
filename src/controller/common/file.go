@@ -75,6 +75,40 @@ func (c *JudgementCreateFileController) Post() {
 	c.Ctx.Output.JSON(response, true, false)
 }
 
+type AdminUploadFileController struct {
+	beego.Controller
+}
+
+func (c *AdminUploadFileController) Post() {
+	user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+	user := user_interface.(*master_types.User)
+
+	file, header, err := c.GetFile("file")
+	if err != nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+		return
+	}
+
+	game_id, err := primitive.ObjectIDFromHex(c.GetString("game_id"))
+	if err != nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+		return
+	}
+
+	response := master_servce.AdminUploadFileService(
+		user,
+		file,
+		header,
+		game_id,
+	)
+	c.Ctx.Output.JSON(response, true, false)
+}
+
 type GetFileController struct {
 	beego.Controller
 }
