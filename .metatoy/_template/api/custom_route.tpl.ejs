@@ -1,0 +1,11 @@
+/* @MT-TPL-FILE
+ * @Desc: 后端路由更新
+ * @To: src/routers/routes.go
+ * @Replace: -
+ */
+
+    /* @MT-TPL-ROUTE-CUSTOM-START */
+    /* @Replace: append */
+    /* @SkipIf: beego.Router("<%=DATA.REQ.route%> */
+    beego.Router("<%=DATA.REQ.route%>", &custom.<%= H.u2bc(DATA.REQ.route)%>Controller{})
+    /* @MT-TPL-ROUTE-CUSTOM-END */

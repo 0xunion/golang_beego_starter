@@ -56,6 +56,13 @@ if (command_name?.toLocaleLowerCase() == 'custom')
         const custom = custom_data[key];
         if( custom )
         {
+            // check validate has required
+            for (let [key, value] of Object.entries(custom.args)) {
+                if( !value.validate.required ) {
+                    value.validate.required = true;
+                }
+            }
+
             if(custom.service) {
                 console.log( `🚀 ${key} 处理中...` );
                 engine( path.join(tpl_path, 'api/custom_service.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
@@ -65,6 +72,27 @@ if (command_name?.toLocaleLowerCase() == 'custom')
         }
     }
 } 
+else if (command_name?.toLocaleLowerCase() == 'custom_route') {
+    // 加载自定义接口配置文件
+    let custom_data = {};
+    const custom_file_name = options['custom-file'] || 'metatoy.custom.jsonc';
+    const custom_file = path.join(__dirname, custom_file_name);
+    if( fs.existsSync(custom_file) )
+    {
+        const parsed =  JSONC.parse(fs.readFileSync(custom_file, 'utf8'));
+        if( parsed ) custom_data = parsed;
+    }
+
+    // 循环每一个自定义接口配置
+    for( let key in custom_data ) {
+        const custom = custom_data[key];
+        if( custom )
+        {
+            console.log( `🚀 ${key} 处理中...` );
+            engine( path.join(tpl_path, 'api/custom_route.tpl.ejs'), {"DB":db_data,"REQ":custom}, options );
+        }
+    }
+}
 else if (command_name?.toLocaleLowerCase() == 'permission') {
     for (let [key, value] of Object.entries(db_data.tables)) {
         if( value )

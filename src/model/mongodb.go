@@ -60,6 +60,10 @@ func MongoHasFlagFilter(value int) MongoFilterItem {
 	return MongoFilterItem{Key: "basictype.flag", Value: bson.M{"$bitsAllSet": value}}
 }
 
+func MongoSort(key string, order int) bson.D {
+	return bson.D{{Key: key, Value: order}}
+}
+
 // this filter will check if the value is in the range
 // eg: MongoValueInRangeFilter("age", 18, 30, true, false) will check if the age is in [18, 30)
 //

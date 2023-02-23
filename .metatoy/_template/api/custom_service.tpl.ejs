@@ -231,6 +231,60 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
     if err != nil {
         return master_types.ErrorResponse(-500, err.Error())
     }
+    <%_ } else if (action.type == 'list') {_%>
+    // list <%= action.model %>
+    var D_page int64 = 1
+    var D_limit int64 = 10
+    var D_sort = ""
+    var D_value = 1 // 1: asc, -1: desc
+    <%_ for (const key in action.model_info??[]) {_%>
+    <%_ if (key == '$page') {_%>
+    D_page = int64(<%= H.bc(action.model_info[key]) %>)
+    <%_ } else if (key == '$limit') {_%>
+    D_limit = int64(<%= H.bc(action.model_info[key]) %>)
+    <%_ } else if (key == '$sort') {_%>
+        <%_ if (action.model_info[key].type == 'const') {_%>
+    D_sort = "<%= action.model_info[key].field %>"
+        <%_ } else if (action.model_info[key].type == 'form') {_%>
+    D_sort = <%= H.bc(action.model_info[key].field) %>
+        <%_ } _%>
+    D_value = <%= action.model_info[key].value %>
+    <%_ } _%>
+    <%_ } _%>
+
+    <%_ if (action.model_info.dst) {_%>
+    var D_<%= H.ul(action.model_info.dst) %> []master_types.<%= action.model %>
+    <%_ } _%>
+
+    {
+        var skip = int64((D_page - 1) * D_limit)
+        var limit = int64(D_limit)
+        value, err := model.ModelGetAll[master_types.<%= action.model %>](
+            model.NewMongoFilter(
+                <%_ for (const key in action.model_info??[]) {_%>
+                <%_ if (!H.is_$type(key)) {_%>
+                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
+                <%_ } _%>
+                <%_ } _%>
+            ),
+            &model.MongoOptions{
+                Skip:  &skip,
+                Limit: &limit,
+                Sort:  model.MongoSort(D_sort, D_value),
+            },
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+        <%_ if (action.dst) {_%>
+        D_<%= H.ul(action.dst) %> = value
+        <%_ } _%>
+
+        <%_ if (action.set) {_%>
+            <%= H.u2lc(DATA.REQ.route)%>Response.<%= H.bc(action.set) %> = value
+        <%_ } _%>
+    }
+
     <%_ } _%>
     <%_ } _%>
 

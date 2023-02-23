@@ -45,7 +45,7 @@ func (c *<%= H.u2bc(DATA.REQ.route)%>Controller) <%= H.bc(H.custom_method(DATA.R
     var request_params struct {
     <%_ for( const arg in DATA.REQ.args??[] ){_%>
     <%_ if (H.is_native_type(DATA.REQ.args[arg].type)) {_%>
-        <%= H.bc(arg) %> <%= DATA.REQ.args[arg].type %> `json:"<%= arg %>" form:"<%= arg %>" validate:"<%= H.beego_validate(DATA.REQ.args[arg].type, DATA.REQ.args[arg].validate) %>"`
+        <%= H.bc(arg) %> <%= DATA.REQ.args[arg].type %> `json:"<%= arg %>" form:"<%= arg %>" valid:"<%= H.beego_validate(DATA.REQ.args[arg].type, DATA.REQ.args[arg].validate) %>"`
     <%_ } _%>
     <%_ } _%>
     }

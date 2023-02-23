@@ -95,6 +95,11 @@ export class Helper {
         return type.indexOf('master_types') != -1;
     }
 
+    is_$type( type )
+    {
+        return type.startsWith('$');
+    }
+
     beego_validate( type, rules ) 
     {
         const validate_string = [];
@@ -132,7 +137,7 @@ export class Helper {
             }
         }
 
-        return validate_string.join(',');
+        return validate_string.join(';');
     }
 
     table( meta, table )

@@ -74,15 +74,9 @@
                     "header_html" : "header_html",
                     "start_time" : "start_time",
                     "end_time" : "end_time",
-                    "create_at" : "$time"
-                },
-                // permission to be created when the model is created
-                "permission" : [
-                    {
-                        "owner" : "uid",
-                        "permission" : ["r", "w"]
-                    }
-                ]
+                    "create_at" : "$time",
+                    "owner" : "$user"
+                }
             }
         ],
         "response" : {
@@ -90,6 +84,58 @@
         },
         "description" : "create a game",
         "description_cn" : "创建一个比赛"
+    },
+    {
+        "route" : "/api/custom/admin/game/list",
+        "method" : "get",
+        "args" : {
+            "page" : {
+                "type" : "int64",
+                "validate" : {
+                    "min" : 1
+                },
+            },
+            "page_size" : {
+                "type" : "int64",
+                "validate" : {
+                    "min" : 1,
+                    "max" : 100
+                },
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "list",
+                "model" : "Game",
+                "model_info" : {
+                    "$page" : "page",
+                    "$limit" : "page_size",
+                    "$sort" : {
+                        "type" : "const", // const, form
+                        "field" : "_id", // the field name
+                        "value" : "-1" // asc: 1, desc: -1
+                    }
+                    // "owner" : "$user"
+                },
+                //"dst" : "games", // the list result will be named as dollar_games
+                "set" : "games" // the list result will be set to the response field named games
+            }
+        ],
+        "response" : {
+            "success" : "bool",
+            "games" : "[]master_types.Game"
+        },
+        "description" : "list all games",
+        "description_cn" : "列出所有比赛"
     },
     {
         "route" : "/api/custom/admin/game/template/red_team",
