@@ -2,6 +2,7 @@ package custom
 
 /* @MT-TPL-IMPORT-START */
 import (
+	"os"
 	"strconv"
 	"time"
 
@@ -62,7 +63,8 @@ func ApiCustomAdminGameTemplateLeaderService(
 	// Save file
 	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
 	date := time.Now().Format("2006-01-02")
-	file_path := "generate/" + date + "/" + random_hash
+	file_path := "storage/generate/" + date + "/" + random_hash + ".xlsx"
+	os.MkdirAll("storage/generate/"+date, os.ModePerm)
 
 	err := f.SaveAs(file_path)
 	if err != nil {
