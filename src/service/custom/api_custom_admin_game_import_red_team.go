@@ -2,6 +2,7 @@ package custom
 
 /* @MT-TPL-IMPORT-START */
 import (
+	"os"
 	"strconv"
 	"time"
 
@@ -18,24 +19,24 @@ import (
 /* @MT-TPL-SERVICE-START */
 // /api/custom/admin/game/import/red_team Service 从文件导入红队信息
 func ApiCustomAdminGameImportRedTeamService(
-    user *master_types.User,
-    GameId master_types.PrimaryId,
-    RedTeamFileId master_types.PrimaryId,
-) (*master_types.MasterResponse) {
-    var apiCustomAdminGameImportRedTeamResponse struct {
-        Success bool `json:"success"`
-        FileId master_types.PrimaryId `json:"file_id"`
-    }
+	user *master_types.User,
+	GameId master_types.PrimaryId,
+	RedTeamFileId master_types.PrimaryId,
+) *master_types.MasterResponse {
+	var apiCustomAdminGameImportRedTeamResponse struct {
+		Success bool                   `json:"success"`
+		FileId  master_types.PrimaryId `json:"file_id"`
+	}
 
-    access_controll := false
-    if !access_controll && user.IsAdmin() {
-        access_controll = true
-    }
+	access_controll := false
+	if !access_controll && user.IsAdmin() {
+		access_controll = true
+	}
 
-    if !access_controll {
-        return master_types.ErrorResponse(-403, "Permission denied")
-    }
-/* @MT-TPL-SERVICE-END */
+	if !access_controll {
+		return master_types.ErrorResponse(-403, "Permission denied")
+	}
+	/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	file_id := RedTeamFileId
@@ -275,7 +276,8 @@ func ApiCustomAdminGameImportRedTeamService(
 	// Save file
 	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
 	date := time.Now().Format("2006-01-02")
-	file_path = "generate/" + date + "/" + random_hash
+	file_path = "storage/storage/generate/" + date + "/" + random_hash + ".xlsx"
+	os.MkdirAll("storage/storage/generate/"+date, 0777)
 
 	err = f.SaveAs(file_path)
 	if err != nil {
@@ -301,7 +303,7 @@ func ApiCustomAdminGameImportRedTeamService(
 	apiCustomAdminGameImportRedTeamResponse.FileId = id
 	/* @MT-TPL-SERVICE-RESP-START */
 
-    return master_types.SuccessResponse(apiCustomAdminGameImportRedTeamResponse)
+	return master_types.SuccessResponse(apiCustomAdminGameImportRedTeamResponse)
 }
 
-    /* @MT-TPL-SERVICE-RESP-END */
+/* @MT-TPL-SERVICE-RESP-END */
