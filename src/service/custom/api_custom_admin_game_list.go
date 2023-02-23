@@ -55,7 +55,7 @@ func ApiCustomAdminGameListService(
             return master_types.ErrorResponse(-500, err.Error())
         }
 
-            apiCustomAdminGameListResponse.Games = value
+        apiCustomAdminGameListResponse.Games = value
     }
 /* @MT-TPL-SERVICE-END */
 

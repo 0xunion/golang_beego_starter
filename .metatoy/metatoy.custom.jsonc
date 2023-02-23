@@ -497,7 +497,7 @@
         "description_cn" : "从文件导入甲方信息，文件格式参考甲方模板"
     },
     {
-        "route" : "/api/custom/manage/rank",
+        "route" : "/api/custom/manage/rank/red_team",
         "method" : "get",
         "args" : {
             "game_id" : {
@@ -532,7 +532,81 @@
             }
         ],
         "actions" : [
-
+            {
+                "type" : "list", 
+                "model" : "ReadTeam",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "$page" : "page",
+                    "$page_size" : "page_size",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "score",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "rank"
+            }
+        ],
+        "response" : {
+            "success" : "bool",
+            "rank" : "any",
+            "total" : "int"
+        },
+        "description" : "get rank",
+        "description_cn" : "后台获取排名"
+    },
+    {
+        "route" : "/api/custom/manage/rank/blue_team",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "page" : {
+                "type" : "int",
+                "validate" : {}
+            },
+            "page_size" : {
+                "type" : "int",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" :"list",
+                "model" : "Defender",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "$page" : "page",
+                    "$page_size" : "page_size",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "score",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "rank"
+            }
         ],
         "response" : {
             "success" : "bool",
@@ -583,7 +657,21 @@
             }
         ],
         "actions" : [
-
+            {
+                "type" : "list",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "$page" : "page",
+                    "$page_size" : "page_size",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "reports"
+            }
         ],
         "response" : {
             "success" : "bool",

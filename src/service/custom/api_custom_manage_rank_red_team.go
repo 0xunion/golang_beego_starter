@@ -1,25 +1,21 @@
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-)
-
-/* @MT-TPL-IMPORT-END */
+	/* @MT-TPL-IMPORT-TIME-START */ /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
-// /api/custom/manage/report/list Service 获取红队提交的报告列表
-func ApiCustomManageReportListService(
+// /api/custom/manage/rank/red_team Service 后台获取排名
+func ApiCustomManageRankRedTeamService(
 	user *master_types.User,
 	GameId master_types.PrimaryId,
 	Page int,
 	PageSize int,
-	Order int,
 ) *master_types.MasterResponse {
-	var apiCustomManageReportListResponse struct {
+	var apiCustomManageRankRedTeamResponse struct {
 		Success bool `json:"success"`
-		Reports any  `json:"reports"`
+		Rank    any  `json:"rank"`
 		Total   int  `json:"total"`
 	}
 
@@ -44,19 +40,19 @@ func ApiCustomManageReportListService(
 		return master_types.ErrorResponse(-403, "Permission denied")
 	}
 
-	// list Report
+	// list ReadTeam
 	var D_page int64 = 1
 	var D_limit int64 = 10
 	var D_sort = ""
 	var D_value = 1 // 1: asc, -1: desc
 	D_page = int64(Page)
-	D_sort = "_id"
+	D_sort = "score"
 	D_value = -1
 
 	{
 		var skip = int64((D_page - 1) * D_limit)
 		var limit = int64(D_limit)
-		value, err := model.ModelGetAll[master_types.Report](
+		value, err := model.ModelGetAll[master_types.ReadTeam](
 			model.NewMongoFilter(
 				model.MongoKeyFilter("game_id", GameId),
 			),
@@ -70,7 +66,7 @@ func ApiCustomManageReportListService(
 			return master_types.ErrorResponse(-500, err.Error())
 		}
 
-		apiCustomManageReportListResponse.Reports = value
+		apiCustomManageRankRedTeamResponse.Rank = value
 	}
 	/* @MT-TPL-SERVICE-END */
 
@@ -78,7 +74,7 @@ func ApiCustomManageReportListService(
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomManageReportListResponse)
+	return master_types.SuccessResponse(apiCustomManageRankRedTeamResponse)
 }
 
 /* @MT-TPL-SERVICE-RESP-END */

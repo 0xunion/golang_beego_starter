@@ -97,7 +97,27 @@ export class Helper {
 
     is_$type( type )
     {
+        if (typeof type != 'string'){
+            return false;
+        }
         return type.startsWith('$');
+    }
+
+    $type( type, decorator )
+    {
+        let host = type.split('$')[1];
+        let parts = host.split('.');
+        if (parts.length == 1) {
+            if (decorator) {
+                return decorator(parts[0])
+            }
+            return parts[0];
+        } else {
+            if (decorator) {
+                return decorator(parts[0]) + '.' + parts[1];
+            }
+            return parts[1] + '.' + parts[0];
+        }
     }
 
     beego_validate( type, rules ) 
