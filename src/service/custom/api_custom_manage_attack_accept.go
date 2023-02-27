@@ -39,6 +39,51 @@ func ApiCustomManageAttackAcceptService(
     if !access_controll {
         return master_types.ErrorResponse(-403, "Permission denied")
     }
+
+    
+    // get Attack
+
+
+    {
+_, err := model.ModelGet[master_types.Attack](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", AttackId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+
+    }
+
+    // update Attack
+    
+    {
+        err := model.ModelUpdateField[master_types.Attack](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", AttackId),
+                model.MongoKeyFilter("state", master_types.ATTACK_STATE_UNVERIFIED),
+            ),
+
+
+
+            model.MongoSetField(
+                "state", 
+                master_types.ATTACK_STATE_ACCEPTED,
+            ),
+        )
+
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+    }
+
+        
+    // set response directly
+    apiCustomManageAttackAcceptResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do

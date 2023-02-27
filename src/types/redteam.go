@@ -1,6 +1,6 @@
 package types
 
-type ReadTeam struct {
+type RedTeam struct {
 	BasicType
 	Id     PrimaryId `json:"id" bson:"_id,omitempty"`
 	Name   string    `json:"name" bson:"name"`

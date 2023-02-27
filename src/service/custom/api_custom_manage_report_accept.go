@@ -15,6 +15,7 @@ func ApiCustomManageReportAcceptService(
     GameId master_types.PrimaryId,
     ReportId master_types.PrimaryId,
     Score int,
+    DefenderScore int,
 ) (*master_types.MasterResponse) {
     var apiCustomManageReportAcceptResponse struct {
         Success bool `json:"success"`
@@ -40,6 +41,101 @@ func ApiCustomManageReportAcceptService(
     if !access_controll {
         return master_types.ErrorResponse(-403, "Permission denied")
     }
+
+    
+    // get Report
+
+    var D_report *master_types.Report
+
+    {
+value, err := model.ModelGet[master_types.Report](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", ReportId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+        D_report = value
+
+    }
+
+    // update Report
+    
+    {
+        err := model.ModelUpdateField[master_types.Report](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", ReportId),
+                model.MongoKeyFilter("state", master_types.REPORT_STATE_UNVERIFIED),
+            ),
+
+
+
+            model.MongoIncField(
+                "score", 
+                Score,
+            ),
+            model.MongoSetField(
+                "state", 
+                master_types.REPORT_STATE_ACCEPTED,
+            ),
+        )
+
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+    }
+
+    // update Defender
+    
+    {
+        err := model.ModelUpdateField[master_types.Defender](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", D_report.DefenderId),
+            ),
+
+
+
+            model.MongoDecField(
+                "score", 
+                DefenderScore,
+            ),
+        )
+
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+    }
+
+    // update RedTeam
+    
+    {
+        err := model.ModelUpdateField[master_types.RedTeam](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", D_report.AttackTeamId),
+            ),
+
+
+
+            model.MongoIncField(
+                "score", 
+                Score,
+            ),
+        )
+
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+    }
+
+        
+    // set response directly
+    apiCustomManageReportAcceptResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do

@@ -40,6 +40,43 @@ func ApiCustomAttackerReportDetailService(
     if !access_controll {
         return master_types.ErrorResponse(-403, "Permission denied")
     }
+
+    
+    // get Gamer
+
+
+    {
+_, err := model.ModelGet[master_types.Gamer](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("owner", user.Id),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+
+    }
+
+    // get Report
+
+
+    {
+value, err := model.ModelGet[master_types.Report](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("attack_team_id", gamer.GroupId),
+                model.MongoKeyFilter("_id", ReportId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+
+        apiCustomAttackerReportDetailResponse.Report = value
+    }
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do

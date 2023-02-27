@@ -2,7 +2,6 @@
     {
         "route" : "/api/custom/admin/game/create",
         "method" : "post",
-        // controller layer argument check
         "args" : {
             "name" : {
                 "type" : "string",
@@ -36,33 +35,13 @@
             }
         },
         "require_login" : true,
-        // create service layer or not
         "service" : {
             "generate" : true
         },
-        // service layer permission check
         "permissions" : [
             {
                 "mode" : "admin"
-            },
-            // {
-            //     "mode" : "granularity", // if a group has permission to 
-            //     "model" : "Game", // full type name
-            //     "model_info" : {
-            //         "id" : "game_id" // this point out how to get the model to be checked
-            //     },
-            //     "granularity" : "group",
-            //     "permission" : ["r", "w"]
-            // },
-            // {
-            //     "mode" : "granularity",
-            //     "granularity" : "user",
-            //     "model" : "Game",
-            //     "model_info" : {
-            //         "id" : "game_id"
-            //     },
-            //     "permission" : ["r", "w"]
-            // }
+            }
         ],
         "actions" : [
             {
@@ -93,14 +72,14 @@
                 "type" : "int64",
                 "validate" : {
                     "min" : 1
-                },
+                }
             },
             "page_size" : {
                 "type" : "int64",
                 "validate" : {
                     "min" : 1,
                     "max" : 100
-                },
+                }
             }
         },
         "require_login" : true,
@@ -120,14 +99,12 @@
                     "$page" : "page",
                     "$limit" : "page_size",
                     "$sort" : {
-                        "type" : "const", // const, form
-                        "field" : "_id", // the field name
-                        "value" : "-1" // asc: 1, desc: -1
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
                     }
-                    // "owner" : "$user"
                 },
-                //"dst" : "games", // the list result will be named as dollar_games
-                "set" : "games" // the list result will be set to the response field named games
+                "set" : "games"
             }
         ],
         "response" : {
@@ -534,7 +511,7 @@
         "actions" : [
             {
                 "type" : "list", 
-                "model" : "ReadTeam",
+                "model" : "RedTeam",
                 "model_info" : {
                     "game_id" : "GameId",
                     "$page" : "page",
@@ -645,7 +622,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -696,6 +672,10 @@
             "score" : {
                 "type" : "int",
                 "validate" : {}
+            },
+            "defender_score" : {
+                "type" : "int",
+                "validate" : {}
             }
         },
         "require_login" : true,
@@ -706,7 +686,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -718,7 +697,72 @@
             }
         ],
         "actions" : [
-
+            {
+                "type" : "get",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "report_id"
+                },
+                "dst" : "report"
+            },
+            {
+                "type" : "update",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "report_id",
+                    "state" : "master_types.REPORT_STATE_UNVERIFIED"
+                },
+                "update" : [
+                    {
+                        "type" : "inc",
+                        "field" : "score",
+                        "value" : "score"
+                    },
+                    {
+                        "type" : "set",
+                        "field" : "state",
+                        "value" : "master_types.REPORT_STATE_ACCEPTED"
+                    }
+                ]
+            },
+            {
+                "type" : "update",
+                "model" : "Defender",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "$report.DefenderId"
+                },
+                "update" : [
+                    {
+                        "type" : "dec",
+                        "field" : "score",
+                        "value" : "defender_score"
+                    }
+                ]
+            },
+            {
+                "type" : "update",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "$report.AttackTeamId"
+                },
+                "update" : [
+                    {
+                        "type" : "inc",
+                        "field" : "score",
+                        "value" : "score"
+                    }
+                ]
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : true
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -751,7 +795,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -763,7 +806,49 @@
             }
         ],
         "actions" : [
-
+            // first get report then update report state, finally, create ReportComment
+            {
+                "type" : "get",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "report_id"
+                },
+                "dst" : "$none"
+            },
+            {
+                "type" : "update",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "report_id",
+                    "state" : "master_types.REPORT_STATE_UNVERIFIED"
+                },
+                "update" : [
+                    {
+                        "type" : "set",
+                        "field" : "state",
+                        "value" : "master_types.REPORT_STATE_REJECTED"
+                    }
+                ]
+            },
+            {
+                "type" : "create",
+                "model" : "ReportComment",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "report_id" : "report_id",
+                    "content" : "comment",
+                    "create_at" : "$time",
+                    "owner" : "$user"
+                }
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : "true"
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -796,7 +881,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -808,7 +892,33 @@
             }
         ],
         "actions" : [
-
+            // first get report then update report state, finally, create ReportComment
+            {
+                "type" : "get",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "report_id"
+                },
+                "dst" : "$none"
+            },
+            {
+                "type" : "create",
+                "model" : "ReportComment",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "report_id" : "report_id",
+                    "content" : "comment",
+                    "create_at" : "$time",
+                    "owner" : "$user"
+                }
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : "true"
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -827,7 +937,7 @@
             "attack_id" : {
                 "type" : "master_types.PrimaryId",
                 "validate" : {}
-            },
+            }
         },
         "require_login" : true,
         "service" : {
@@ -837,7 +947,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -849,7 +958,38 @@
             }
         ],
         "actions" : [
-
+            // first get attack then update attack state
+            {
+                "type" : "get",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "attack_id"
+                },
+                "dst" : "$none"
+            },
+            {
+                "type" : "update",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "attack_id",
+                    "state" : "master_types.ATTACK_STATE_UNVERIFIED"
+                },
+                "update" : [
+                    {
+                        "type" : "set",
+                        "field" : "state",
+                        "value" : "master_types.ATTACK_STATE_ACCEPTED"
+                    }
+                ]
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : "true"
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -882,7 +1022,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a judge of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -894,7 +1033,43 @@
             }
         ],
         "actions" : [
-
+            // first get attack to check if attack exists, then update it state
+            {
+                "type" : "get",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "attack_id"
+                },
+                "dst" : "$none"
+            },
+            {
+                "type" : "update",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "attack_id",
+                    "state" : "master_types.ATTACK_STATE_UNVERIFIED"
+                },
+                "update" : [
+                    {
+                        "type" : "set",
+                        "field" : "state",
+                        "value" : "master_types.ATTACK_STATE_REJECTED"
+                    },
+                    {
+                        "type" : "set",
+                        "field" : "comment",
+                        "value" : "comment"
+                    }
+                ]
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : "true"
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -919,7 +1094,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -931,11 +1105,24 @@
             }
         ],
         "actions" : [
-
+            {
+                "type" : "list",
+                "model" : "Defender",
+                "model_info" : {
+                    "game_id" : "GameId"
+                },
+                "set" : "defenders"
+            },
+            {
+                "type" : "response",
+                "value" : {
+                    "success" : "true"
+                }
+            }
         ],
         "response" : {
             "success" : "bool",
-            "defenders" : "any"
+            "defenders" : "[]master_types.Defender"
         },
         "description" : "get defender list",
         "description_cn" : "获取防守方列表"
@@ -947,7 +1134,7 @@
             "game_id" : {
                 "type" : "master_types.PrimaryId",
                 "validate" : {}
-            },
+            }
         },
         "require_login" : true,
         "service" : {
@@ -957,7 +1144,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -995,36 +1181,57 @@
                 "validate" : {
                     "required" : true,
                     "min" : 1,
-                    "max" : 16384 // 16k, if this is not enough... fuck you
+                    "max" : 16384
                 }
             },
-            "break_isolation" : {
+            "isolation_break" : {
                 "type" : "int",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 1
+                }
             },
             "vuln_type" : {
                 "type" : "int",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 9
+                }
             },
             "achievement_type" : {
                 "type" : "int",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 1
+                }
             },
             "attack_type" : {
                 "type" : "int",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 5
+                }
             },
             "uri" : {
                 "type" : "string",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 256
+                }
             },
             "vuln_level" : {
                 "type" : "int",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 3
+                }
             },
             "name" : {
                 "type" : "string",
-                "validate" : {}
+                "validate" : {
+                    "min" : 0,
+                    "max" : 256
+                }
             }
         },
         "require_login" : true,
@@ -1035,7 +1242,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1047,14 +1253,50 @@
             }
         ],
         "actions" : [
+            // firstly, get the team of attacker
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                },
+                "dst" : "attacker"
+            },
+            // check if the defender is in the same team
+            {
+                "type" : "get",
+                "model" : "Defender",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "DefenderId"
+                },
+                "dst" : "$none"
+            },
             {
                 "type" : "create",
                 "model" : "Report",
+                "model_info" : {
+                    "owner" : "$user",
+                    "content" : "Content",
+                    "name" : "Name",
+                    "uri" : "Uri",
+                    "level" : "VulnLevel",
+                    "defender_id" : "DefenderId",
+                    "attack_team_id" : "$attacker.GroupId",
+                    "isolation_break" : "IsolationBreak",
+                    "vuln_type" : "VulnType",
+                    "attack_type" : "AttackType",
+                    "create_at" : "$time",
+                    "game_id" : "GameId"
+                },
+                "set" : "report"
             }
         ],
         "response" : {
             "success" : "bool",
-            "report_id" : "any"
+            "report" : "any"
         },
         "description" : "submit report",
         "description_cn" : "提交报告"
@@ -1066,7 +1308,7 @@
             "game_id" : {
                 "type" : "master_types.PrimaryId",
                 "validate" : {}
-            },
+            }
         },
         "require_login" : true,
         "service" : {
@@ -1076,7 +1318,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1122,7 +1363,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1179,7 +1419,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1191,7 +1430,32 @@
             }
         ],
         "actions" : [
-
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                },
+                "dst" : "attacker"
+            },
+            {
+                "type" : "list",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "attack_team_id" : "$attacker.GroupId",
+                    "$page" : "Page",
+                    "$page_size" : "PageSize",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : -1
+                    }
+                },
+                "set" : "attacks"
+            }
         ],
         "response" : {
             "success" : "bool",
@@ -1221,7 +1485,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1233,7 +1496,17 @@
             }
         ],
         "actions" : [
-
+            // get attack detail by attack_id and game_id and owner, ensure the attack is belong to the attacker
+            {
+                "type" : "get",
+                "model" : "Attack",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "_id" : "AttackId"
+                },
+                "set" : "attack"
+            }
         ],
         "response" : {
             "success" : "bool",
@@ -1267,7 +1540,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1279,7 +1551,32 @@
             }
         ],
         "actions" : [
-            
+            // get Gamer firstly, use group_id in gamer to get report list
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user"
+                },
+                "dst" : "gamer"
+            },
+            {
+                "type" : "list",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "attack_team_id" : "$gamer.GroupId",
+                    "$page" : "page",
+                    "$page_size" : "page_size",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "reports"
+            }
         ],
         "response" : {
             "success" : "bool",
@@ -1309,7 +1606,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1321,7 +1617,26 @@
             }
         ],
         "actions" : [
-
+            // get Gamer firstly, use group_id in gamer to get report list
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user"
+                },
+                "dst" : "$none"
+            },
+            {
+                "type" : "get",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "_id" : "ReportId"
+                },
+                "set" : "report"
+            }
         ],
         "response" : {
             "success" : "bool",
@@ -1351,7 +1666,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1363,7 +1677,26 @@
             }
         ],
         "actions" : [
-
+            // get Gamer firstly, use group_id in gamer to get report list
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                },
+                "dst" : "gamer"
+            },
+            {
+                "type" : "delete",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "_id" : "ReportId"
+                }
+            }
         ],
         "response" : {
             "success" : "bool"
@@ -1385,7 +1718,11 @@
             },
             "reason" : {
                 "type" : "string",
-                "validate" : {}
+                "validate" : {
+                    "required" : true,
+                    "min" : 1,
+                    "max" : 1024
+                }
             }
         },
         "require_login" : true,
@@ -1396,7 +1733,6 @@
             {
                 "mode" : "admin"
             },
-            // check if user is a attacker of the game
             {
                 "mode" : "model",
                 "model" : "Gamer",
@@ -1409,7 +1745,33 @@
         ],
         "actions" : [
             {
-                "mode" : "model",
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                },
+                "dst" : "gamer"
+            },
+            {
+                "type" : "update",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "_id" : "ReportId"
+                },
+                "update" : [
+                    {
+                        "type" : "set",
+                        "field" : "state",
+                        "value" : "master_types.REPORT_STATE_UNVERIFIED"
+                    }
+                ]
+            },
+            {
+                "type" : "create",
                 "model" : "ReportComment",
                 "model_info" : {
                     "game_id" : "GameId",

@@ -44,6 +44,9 @@ func ApiCustomAdminGameListService(
         var limit = int64(D_limit)
         value, err := model.ModelGetAll[master_types.Game](
             model.NewMongoFilter(
+                // skip
+                // skip
+                // skip
             ),
             &model.MongoOptions{
                 Skip:  &skip,

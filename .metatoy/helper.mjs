@@ -116,7 +116,7 @@ export class Helper {
             if (decorator) {
                 return decorator(parts[0]) + '.' + parts[1];
             }
-            return parts[1] + '.' + parts[0];
+            return parts[0] + '.' + parts[1];
         }
     }
 

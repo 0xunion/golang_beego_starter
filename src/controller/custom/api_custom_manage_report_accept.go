@@ -31,6 +31,7 @@ func (c *ApiCustomManageReportAcceptController) Post() {
 
     var request_params struct {
         Score int `json:"score" form:"score" valid:"Required"`
+        DefenderScore int `json:"defender_score" form:"defender_score" valid:"Required"`
     }
 
 
@@ -55,10 +56,11 @@ func (c *ApiCustomManageReportAcceptController) Post() {
         request_params_game_id,
         request_params_report_id,
         request_params.Score,
+        request_params.DefenderScore,
     )
 /* @MT-TPL-CONTROLLER-END */
 
-    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+	/* @MT-TPL-CONTROLLER-RESPONSE-START */
 
     c.Ctx.Output.JSON(response, true, false)
 }

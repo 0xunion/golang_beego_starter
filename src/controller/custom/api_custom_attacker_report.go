@@ -31,13 +31,13 @@ func (c *ApiCustomAttackerReportController) Post() {
 
     var request_params struct {
         Content string `json:"content" form:"content" valid:"Required;MinSize(1);MaxSize(16384)"`
-        BreakIsolation int `json:"break_isolation" form:"break_isolation" valid:"Required"`
-        VulnType int `json:"vuln_type" form:"vuln_type" valid:"Required"`
-        AchievementType int `json:"achievement_type" form:"achievement_type" valid:"Required"`
-        AttackType int `json:"attack_type" form:"attack_type" valid:"Required"`
-        Uri string `json:"uri" form:"uri" valid:"Required"`
-        VulnLevel int `json:"vuln_level" form:"vuln_level" valid:"Required"`
-        Name string `json:"name" form:"name" valid:"Required"`
+        IsolationBreak int `json:"isolation_break" form:"isolation_break" valid:"Min(0);Max(1);Required"`
+        VulnType int `json:"vuln_type" form:"vuln_type" valid:"Min(0);Max(9);Required"`
+        AchievementType int `json:"achievement_type" form:"achievement_type" valid:"Min(0);Max(1);Required"`
+        AttackType int `json:"attack_type" form:"attack_type" valid:"Min(0);Max(5);Required"`
+        Uri string `json:"uri" form:"uri" valid:"MinSize(0);MaxSize(256);Required"`
+        VulnLevel int `json:"vuln_level" form:"vuln_level" valid:"Min(0);Max(3);Required"`
+        Name string `json:"name" form:"name" valid:"MinSize(0);MaxSize(256);Required"`
     }
 
 
@@ -62,7 +62,7 @@ func (c *ApiCustomAttackerReportController) Post() {
         request_params_game_id,
         request_params_defender_id,
         request_params.Content,
-        request_params.BreakIsolation,
+        request_params.IsolationBreak,
         request_params.VulnType,
         request_params.AchievementType,
         request_params.AttackType,
@@ -72,7 +72,7 @@ func (c *ApiCustomAttackerReportController) Post() {
     )
 /* @MT-TPL-CONTROLLER-END */
 
-    /* @MT-TPL-CONTROLLER-RESPONSE-START */
+	/* @MT-TPL-CONTROLLER-RESPONSE-START */
 
     c.Ctx.Output.JSON(response, true, false)
 }

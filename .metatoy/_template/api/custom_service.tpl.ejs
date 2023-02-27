@@ -264,10 +264,14 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
         value, err := model.ModelGetAll[master_types.<%= action.model %>](
             model.NewMongoFilter(
                 <%_ for (const key in action.model_info??[]) {_%>
-                <%_ if (!H.is_$type(key)) {_%>
-                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
+                <%_ if (action.model_info[key] == '$user') {_%>
+                model.MongoKeyFilter("<%= key %>", user.Id),
+                <%_ } else if (key == '$page' || key == '$limit' || key == '$sort') {_%>
+                // skip
                 <%_ } else if (H.is_$type(action.model_info[key])) {_%>
-                <%= H.bc(key) %>: D_<%= H.$type(action.model_info[key], H.ul) %>,
+                model.MongoKeyFilter("<%= key %>", D_<%= H.$type(action.model_info[key], H.ul) %>),
+                <%_ } else if (!H.is_$type(key)) {_%>
+                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
                 <%_ } _%>
                 <%_ } _%>
             ),
@@ -292,18 +296,22 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
     <%_ } else if (action.type == 'get') {_%>
     // get <%= action.model %>
 
-    <%_ if (action.model_info.dst) {_%>
-    var D_<%= H.ul(action.model_info.dst) %> *master_types.<%= action.model %>
+    <%_ if (action.dst && action.dst != '$none') {_%>
+    var D_<%= H.ul(action.dst) %> *master_types.<%= action.model %>
     <%_ } _%>
 
     {
-        value, err := model.ModelGet[master_types.<%= action.model %>](
+        <%_ if (action.dst != '$none') { _%> value <%_ } else {_%> _ <%_ } _%>, err := model.ModelGet[master_types.<%= action.model %>](
             model.NewMongoFilter(
                 <%_ for (const key in action.model_info??[]) {_%>
-                <%_ if (!H.is_$type(key)) {_%>
-                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
+                <%_ if (H.is_complex_type(action.model_info[key])) {_%>
+                model.MongoKeyFilter("<%= key %>", <%= action.model_info[key] %>),
+                <%_ } else if (action.model_info[key] == '$user') {_%>
+                model.MongoKeyFilter("<%= key %>", user.Id),
                 <%_ } else if (H.is_$type(action.model_info[key])) {_%>
-                <%= H.bc(key) %>: D_<%= H.$type(action.model_info[key], H.ul) %>,
+                model.MongoKeyFilter("<%= key %>", <%= H.$type(action.model_info[key]) %>),
+                <%_ } else {_%>
+                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
                 <%_ } _%>
                 <%_ } _%>
             ),
@@ -312,7 +320,7 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
             return master_types.ErrorResponse(-500, err.Error())
         }
 
-        <%_ if (action.dst) {_%>
+        <%_ if (action.dst && action.dst != '$none') {_%>
         D_<%= H.ul(action.dst) %> = value
         <%_ } _%>
 
@@ -320,6 +328,88 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
         <%= H.u2lc(DATA.REQ.route)%>Response.<%= H.bc(action.set) %> = value
         <%_ } _%>
     }
+
+    <%_ } else if (action.type == 'update') {_%>
+    // update <%= action.model %>
+    
+    {
+        err := model.ModelUpdateField[master_types.<%= action.model %>](
+            model.NewMongoFilter(
+                <%_ for (const key in action.model_info??[]) {_%>
+                <%_ if (H.is_$type(action.model_info[key])) {_%>
+                model.MongoKeyFilter("<%= key %>", D_<%= H.$type(action.model_info[key]) %>),
+                <%_ } else if (H.is_complex_type(action.model_info[key])) {_%>
+                model.MongoKeyFilter("<%= key %>", <%= action.model_info[key] %>),
+                <%_ } else {_%>
+                model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
+                <%_ } _%>
+                <%_ } _%>
+            ),
+
+            <%_ function parse_update_func_name(name) { _%>
+                <%_ if (name == 'set') {_%>
+                <%_ return 'Set' _%>
+                <%_ } else if (name == 'inc') {_%>
+                <%_ return 'Inc' _%>
+                <%_ } else if (name == 'dec') {_%>
+                <%_ return 'Dec' _%>
+                <%_ } else if (name == 'push') {_%>
+                <%_ return 'Push' _%>
+                <%_ } else if (name == 'pull') {_%>
+                <%_ return 'Pull' _%>
+                <%_ } _%>
+            <%_ } _%>
+
+
+            <%_ for (const update of action.update??[]) {_%>
+            model.Mongo<%= parse_update_func_name(update.type) %>Field(
+                "<%= update.field %>", 
+                <%_ if (H.is_complex_type(update.value)) {_%>
+                <%= update.value %>,
+                <%_ } else if (H.is_$type(update.value)) {_%>
+                D_<%= H.$type(update.value) %>,
+                <%_ } else {_%>
+                <%= H.bc(update.value) %>,
+                <%_ } _%>
+            ),
+            <%_ } _%>
+        )
+
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+    }
+
+    <%_ } else if (action.type == 'response') {_%>
+        
+    // set response directly
+    <%_ for (const key in action.value??[]) {_%>
+    <%= H.u2lc(DATA.REQ.route)%>Response.<%= H.bc(key) %> = <%= action.value[key] %>
+    <%_ } _%>
+
+    <%_ } else if (action.type == 'delete') {_%>
+
+        // delete <%= action.model %>
+    
+        {
+            err := model.ModelDelete[master_types.<%= action.model %>](
+                model.NewMongoFilter(
+                    <%_ for (const key in action.model_info??[]) {_%>
+                    <%_ if (H.is_$type(action.model_info[key])) {_%>
+                    model.MongoKeyFilter("<%= key %>", D_<%= H.$type(action.model_info[key]) %>),
+                    <%_ } else if (H.is_complex_type(action.model_info[key])) {_%>
+                    model.MongoKeyFilter("<%= key %>", <%= action.model_info[key] %>),
+                    <%_ } else {_%>
+                    model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
+                    <%_ } _%>
+                    <%_ } _%>
+                ),
+            )
+    
+            if err != nil {
+                return master_types.ErrorResponse(-500, err.Error())
+            }
+        }
 
     <%_ } _%>
     <%_ } _%>

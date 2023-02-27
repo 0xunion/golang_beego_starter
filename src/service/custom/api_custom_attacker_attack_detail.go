@@ -40,6 +40,26 @@ func ApiCustomAttackerAttackDetailService(
     if !access_controll {
         return master_types.ErrorResponse(-403, "Permission denied")
     }
+
+    
+    // get Attack
+
+
+    {
+value, err := model.ModelGet[master_types.Attack](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("owner", user.Id),
+                model.MongoKeyFilter("_id", AttackId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+
+        apiCustomAttackerAttackDetailResponse.Attack = value
+    }
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do

@@ -190,7 +190,7 @@ func ApiCustomAdminGameImportLeaderService(
 		}
 
 		// write to excel
-		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i+1), uid)
+		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i+1), gamer_model.Name)
 		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i+1), clear_password)
 		f.SetCellValue("Sheet1", "C"+strconv.Itoa(i+1), phone)
 	}

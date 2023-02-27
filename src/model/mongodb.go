@@ -273,6 +273,78 @@ func ModelUpdate[T any](filter MongoFilter, model *T) error {
 	return err
 }
 
+type updateMongoField struct {
+	UpdateType string      // $set, $inc, $push, $pull
+	Field      string      // field name
+	Value      interface{} // if UpdateType is $inc, Value must be int
+}
+
+func MongoIncField(field string, value interface{}) updateMongoField {
+	return updateMongoField{
+		UpdateType: "$inc",
+		Field:      field,
+		Value:      value,
+	}
+}
+
+func MongoDecField(field string, value interface{}) updateMongoField {
+	return updateMongoField{
+		UpdateType: "$inc",
+		Field:      field,
+		Value:      -value.(int),
+	}
+}
+
+func MongoSetField(field string, value interface{}) updateMongoField {
+	return updateMongoField{
+		UpdateType: "$set",
+		Field:      field,
+		Value:      value,
+	}
+}
+
+func MongoPushField(field string, value interface{}) updateMongoField {
+	return updateMongoField{
+		UpdateType: "$push",
+		Field:      field,
+		Value:      value,
+	}
+}
+
+func MongoPullField(field string, value interface{}) updateMongoField {
+	return updateMongoField{
+		UpdateType: "$pull",
+		Field:      field,
+		Value:      value,
+	}
+}
+
+// ModelUpdateField update a model field to mongodb
+func ModelUpdateField[T any](filter MongoFilter, fields ...updateMongoField) error {
+	var data T
+	collection := meta.GetTypeName(data)
+	if !checkAlive() {
+		return errors.New("mongodb connection lost")
+	}
+
+	coll := mongoConn.Database(conf.MongoDBName()).Collection(collection)
+	update := bson.D{}
+	for _, field := range fields {
+		update = append(update, bson.E{Key: field.UpdateType, Value: bson.D{{Key: field.Field, Value: field.Value}}})
+	}
+
+	result, err := coll.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return errors.New("no matched data")
+	}
+
+	return err
+}
+
 // ModelDelete delete a model to mongodb
 func ModelDelete[T any](filter MongoFilter) error {
 	var data T

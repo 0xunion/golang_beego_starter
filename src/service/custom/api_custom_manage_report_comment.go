@@ -2,6 +2,8 @@ package custom
 
 /* @MT-TPL-IMPORT-START */
 import (
+	"time"
+
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
 )
@@ -40,6 +42,41 @@ func ApiCustomManageReportCommentService(
     if !access_controll {
         return master_types.ErrorResponse(-403, "Permission denied")
     }
+
+    
+    // get Report
+
+
+    {
+_, err := model.ModelGet[master_types.Report](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("_id", ReportId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+
+    }
+
+    // create ReportComment
+    var report_comment *master_types.ReportComment = &master_types.ReportComment{
+        GameId: GameId,
+        ReportId: ReportId,
+        Content: Comment,
+        CreateAt: time.Now().Unix(),
+        Owner: user.Id,
+    }
+
+    err := model.ModelInsert(report_comment, nil)
+    if err != nil {
+        return master_types.ErrorResponse(-500, err.Error())
+    }
+        
+    // set response directly
+    apiCustomManageReportCommentResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do

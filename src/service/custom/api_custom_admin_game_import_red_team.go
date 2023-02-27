@@ -147,7 +147,7 @@ func ApiCustomAdminGameImportRedTeamService(
 		group.Id = id
 		groups = append(groups, group)
 
-		read_team := &master_types.ReadTeam{
+		read_team := &master_types.RedTeam{
 			Name:   team_name,
 			GameId: GameId,
 			Gid:    group.Id,
