@@ -1625,7 +1625,7 @@
                     "game_id" : "GameId",
                     "owner" : "$user"
                 },
-                "dst" : "$none"
+                "dst" : "gamer"
             },
             {
                 "type" : "get",

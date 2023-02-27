@@ -44,9 +44,10 @@ func ApiCustomAttackerReportDetailService(
     
     // get Gamer
 
+    var D_gamer *master_types.Gamer
 
     {
-_, err := model.ModelGet[master_types.Gamer](
+value, err := model.ModelGet[master_types.Gamer](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("owner", user.Id),
@@ -56,6 +57,7 @@ _, err := model.ModelGet[master_types.Gamer](
             return master_types.ErrorResponse(-500, err.Error())
         }
 
+        D_gamer = value
 
     }
 
@@ -66,7 +68,7 @@ _, err := model.ModelGet[master_types.Gamer](
 value, err := model.ModelGet[master_types.Report](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("attack_team_id", gamer.GroupId),
+                model.MongoKeyFilter("attack_team_id", D_gamer.GroupId),
                 model.MongoKeyFilter("_id", ReportId),
             ),
         )

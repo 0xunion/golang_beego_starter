@@ -309,7 +309,7 @@ func <%= H.u2bc(DATA.REQ.route)%>Service(
                 <%_ } else if (action.model_info[key] == '$user') {_%>
                 model.MongoKeyFilter("<%= key %>", user.Id),
                 <%_ } else if (H.is_$type(action.model_info[key])) {_%>
-                model.MongoKeyFilter("<%= key %>", <%= H.$type(action.model_info[key]) %>),
+                model.MongoKeyFilter("<%= key %>", D_<%= H.$type(action.model_info[key]) %>),
                 <%_ } else {_%>
                 model.MongoKeyFilter("<%= key %>", <%= H.bc(action.model_info[key]) %>),
                 <%_ } _%>
