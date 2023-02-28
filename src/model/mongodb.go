@@ -444,7 +444,7 @@ func getLookup[T any, R any]() ([]Lookup, error) {
 							continue
 						}
 						if bsonTagList[0] == tagList[1] {
-							foreignField = bsonTag
+							foreignField = bsonTagList[0]
 						}
 					}
 

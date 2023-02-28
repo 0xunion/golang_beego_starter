@@ -33,7 +33,7 @@ func ApiCustomAllGameListService(
 		Owner    master_types.PrimaryId `json:"owner" bson:"owner"`
 		GameId   master_types.PrimaryId `json:"game_id" bson:"game_id"`
 		Score    int64                  `json:"score" bson:"score"`
-		Game     master_types.Game      `json:"gamer" bson:"gamer" join:"game_id=_id"`
+		Game     master_types.Game      `json:"game" bson:"game" join:"game_id=_id"`
 	}
 
 	games, err := model.ModelGetAllJoin[master_types.Gamer, game](
