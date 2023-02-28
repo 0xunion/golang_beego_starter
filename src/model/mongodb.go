@@ -421,7 +421,13 @@ func getLookup[T any, R any]() ([]Lookup, error) {
 							continue
 						}
 						bsonTag := field.Tag.Get("bson")
-						if bsonTag == tagList[0] {
+						// split bson tag to get the real tag
+						bsonTagList := gostrings.Split(bsonTag, ",")
+						if len(bsonTagList) == 0 {
+							continue
+						}
+
+						if bsonTagList[0] == tagList[0] {
 							localField = bsonTag
 						}
 					}
@@ -432,7 +438,12 @@ func getLookup[T any, R any]() ([]Lookup, error) {
 							continue
 						}
 						bsonTag := field.Tag.Get("bson")
-						if bsonTag == tagList[1] {
+						// split bson tag to get the real tag
+						bsonTagList := gostrings.Split(bsonTag, ",")
+						if len(bsonTagList) == 0 {
+							continue
+						}
+						if bsonTagList[0] == tagList[1] {
 							foreignField = bsonTag
 						}
 					}

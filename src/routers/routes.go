@@ -52,7 +52,8 @@ func registerCommon() {
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
-	beego.Router("/api/custom/manage/rank/blue_team", &custom.ApiCustomManageRankBlueTeamController{})
+    beego.Router("/api/custom/all/game/list", &custom.ApiCustomAllGameListController{})
+    beego.Router("/api/custom/manage/rank/blue_team", &custom.ApiCustomManageRankBlueTeamController{})
 	beego.Router("/api/custom/manage/rank/red_team", &custom.ApiCustomManageRankRedTeamController{})
 	beego.Router("api/custom/admin/game/template/judge", &custom.ApiCustomAdminGameTemplateJudgeController{})
 	beego.Router("/api/custom/admin/game/list", &custom.ApiCustomAdminGameListController{})
@@ -85,5 +86,5 @@ func registerCustom() {
 	beego.Router("/api/custom/admin/game/import/defender", &custom.ApiCustomAdminGameImportDefenderController{})
 	beego.Router("/api/custom/admin/game/template/red_team", &custom.ApiCustomAdminGameTemplateRedTeamController{})
 	beego.Router("/api/custom/admin/game/create", &custom.ApiCustomAdminGameCreateController{})
-	/* @MT-TPL-ROUTE-CUSTOM-END */
+    /* @MT-TPL-ROUTE-CUSTOM-END */
 }
