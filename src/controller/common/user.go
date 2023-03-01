@@ -4,6 +4,7 @@ import (
 	"github.com/0xunion/exercise_back/src/controller"
 	"github.com/0xunion/exercise_back/src/service/common"
 	"github.com/0xunion/exercise_back/src/types"
+	master_types "github.com/0xunion/exercise_back/src/types"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
@@ -63,4 +64,20 @@ func (c *InitRootUserController) Post() {
 	}
 
 	c.Ctx.Output.JSON(common.InitRootUserService(request_params.Email, request_params.Password), true, false)
+}
+
+type InfoSelfController struct {
+	beego.Controller
+}
+
+func (c *InfoSelfController) Get() {
+	user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+	user := user_interface.(*master_types.User)
+
+	c.Ctx.Output.JSON(master_types.SuccessResponse(user), true, false)
 }

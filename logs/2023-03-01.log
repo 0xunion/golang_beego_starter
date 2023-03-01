@@ -1,0 +1,38 @@
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][MongoDB] Start connect mongodb
+[INFO][cache] init cache
+[INFO][Cache] Start init redis
+[INFO][Cache] Start connect redis
+[INFO][MongoDB] Connect success
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][MongoDB] Start connect mongodb
+[INFO][cache] init cache
+[INFO][Cache] Start init redis
+[INFO][MongoDB] Connect success
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][MongoDB] Start connect mongodb
+[INFO][cache] init cache
+[INFO][MongoDB] Connect success
+[INFO][Cache] Start init redis
+[INFO][Cache] Start connect redis
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][cache] init cache
+[INFO][Cache] Start init redis
+[INFO][Cache] Start connect redis
+[INFO][MongoDB] Connect success
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][MongoDB] Start connect mongodb
+[INFO][cache] init cache
+[INFO][MongoDB] Connect success
+[INFO][Cache] Start init redis
+[INFO][Cache] Start connect redis

@@ -3,26 +3,26 @@ package custom
 import (
 	"github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-	/* @MT-TPL-IMPORT-TIME-START */ /* @MT-TPL-IMPORT-TIME-END */)
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
 // /api/custom/all/game/list Service 获取所有比赛列表
 func ApiCustomAllGameListService(
-	user *master_types.User,
-) *master_types.MasterResponse {
-	var apiCustomAllGameListResponse struct {
-		Success bool `json:"success"`
-		Games   any  `json:"games"`
-	}
+    user *master_types.User,
+) (*master_types.MasterResponse) {
+    var apiCustomAllGameListResponse struct {
+        Success bool `json:"success"`
+        Games any `json:"games"`
+    }
 
-	access_controll := false
-	access_controll = true
+    access_controll := false
+        access_controll = true
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	type game struct {
@@ -51,7 +51,7 @@ func ApiCustomAllGameListService(
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAllGameListResponse)
+    return master_types.SuccessResponse(apiCustomAllGameListResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */

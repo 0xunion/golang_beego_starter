@@ -9,15 +9,17 @@ import (
     master_types "github.com/0xunion/exercise_back/src/types"
     custom_service "github.com/0xunion/exercise_back/src/service/custom"
     
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomAllGameListController struct {
+type ApiCustomAdminGamerListController struct {
     beego.Controller
 }
 
-func (c *ApiCustomAllGameListController) Get() {
+func (c *ApiCustomAdminGamerListController) Get() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -27,17 +29,27 @@ func (c *ApiCustomAllGameListController) Get() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
+        Page int64 `json:"page" form:"page" valid:"Min(1);Required"`
+        PageSize int64 `json:"page_size" form:"page_size" valid:"Min(1);Max(100);Required"`
     }
 
 
+    request_params_game_id, err := primitive.ObjectIDFromHex(c.GetString("game_id"))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
 
     if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
     }
 
-    response := custom_service.ApiCustomAllGameListService(
+    response := custom_service.ApiCustomAdminGamerListService(
         user,
+        request_params_game_id,
+        request_params.Page,
+        request_params.PageSize,
     )
 /* @MT-TPL-CONTROLLER-END */
 

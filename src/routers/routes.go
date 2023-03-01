@@ -29,6 +29,7 @@ func registerCommon() {
 	beego.Router("/api/common/auth/login/email_password", &common.UserLoginByEmailAndPasswordController{})
 	beego.Router("/api/common/auth/login/phone_password", &common.UserLoginByPhoneAndPasswordController{})
 	beego.Router("/api/common/auth/init/root", &common.InitRootUserController{})
+	beego.Router("/api/common/auth/self/info", &common.InfoSelfController{})
 
 	// group
 	beego.Router("/api/common/auth/group/create", &common.CreateGroupController{})
@@ -52,6 +53,12 @@ func registerCommon() {
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
+    beego.Router("/api/custom/admin/gamer/list", &custom.ApiCustomAdminGamerListController{})
+    beego.Router("/api/custom/admin/game/update", &custom.ApiCustomAdminGameUpdateController{})
+    beego.Router("/api/custom/all/game/detail", &custom.ApiCustomAllGameDetailController{})
+    beego.Router("/api/custom/attacker/report/commit", &custom.ApiCustomAttackerReportCommitController{})
+    beego.Router("/api/custom/defender/statistics", &custom.ApiCustomDefenderStatisticsController{})
+    beego.Router("/api/custom/attacker/statistics", &custom.ApiCustomAttackerStatisticsController{})
     beego.Router("/api/custom/all/game/list", &custom.ApiCustomAllGameListController{})
     beego.Router("/api/custom/manage/rank/blue_team", &custom.ApiCustomManageRankBlueTeamController{})
 	beego.Router("/api/custom/manage/rank/red_team", &custom.ApiCustomManageRankRedTeamController{})

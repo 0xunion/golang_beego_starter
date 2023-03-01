@@ -8,13 +8,14 @@ type Attack struct {
 	Reason   string    `json:"reason" bson:"reason"`
 	GameId   PrimaryId `json:"game_id" bson:"game_id"`
 	CreateAt int64     `json:"create_at" bson:"create_at"`
+	Commnt   string    `json:"comment" bson:"comment"`
 	State    int       `json:"state" bson:"state"`
 }
 
 type AttackSupportType struct {
-	Name string `json:"name"`
-	CN   string `json:"cn"`
-	Value int `json:"value"`
+	Name  string `json:"name"`
+	CN    string `json:"cn"`
+	Value int    `json:"value"`
 }
 
 func GetAttackStates() []AttackSupportType {
