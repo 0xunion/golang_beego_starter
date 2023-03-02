@@ -43,26 +43,6 @@ func ApiCustomAttackerAttackListService(
     }
 
     
-    // get Gamer
-
-    var D_attacker *master_types.Gamer
-
-    {
-value, err := model.ModelGet[master_types.Gamer](
-            model.NewMongoFilter(
-                model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("owner", user.Id),
-                model.MongoKeyFilter("identity", master_types.GAMER_IDENTITY_ATTACKER),
-            ),
-        )
-        if err != nil {
-            return master_types.ErrorResponse(-500, err.Error())
-        }
-
-        D_attacker = value
-
-    }
-
     // list Attack
     var D_page int64 = 1
     var D_limit int64 = 10
@@ -79,7 +59,7 @@ value, err := model.ModelGet[master_types.Gamer](
         value, err := model.ModelGetAll[master_types.Attack](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("attack_team_id", D_attacker.GroupId),
+                model.MongoKeyFilter("owner", user.Id),
                 // skip
                 // skip
             ),

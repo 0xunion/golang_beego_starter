@@ -194,6 +194,14 @@ func ApiCustomAdminGameImportRedTeamService(
 		)
 
 		if err != nil || phone == nil {
+			// create user
+			var uid master_types.PrimaryId
+			if err = model.ModelInsert(user_model, &uid); err != nil {
+				return master_types.ErrorResponse(-500, err.Error())
+			}
+
+			user_model.Id = uid
+
 			// create password
 			clear_password = user.Phone + strconv.Itoa(num.Random(1000, 9999))
 			password := &master_types.Password{
@@ -218,14 +226,6 @@ func ApiCustomAdminGameImportRedTeamService(
 			if err != nil {
 				return master_types.ErrorResponse(-500, err.Error())
 			}
-
-			// create user
-			var uid master_types.PrimaryId
-			if err = model.ModelInsert(user_model, &uid); err != nil {
-				return master_types.ErrorResponse(-500, err.Error())
-			}
-
-			user_model.Id = uid
 		} else {
 			if phone == nil {
 				return master_types.ErrorResponse(-500, "phone is nil")

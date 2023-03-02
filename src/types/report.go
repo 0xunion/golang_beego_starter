@@ -71,11 +71,13 @@ func GetReportLevels() []ReportSupportType {
 
 const (
 	REPORT_ACHIEVEMENT_TYPE_NONE = iota
+	REPORT_ACHIEVEMENT_TYPE_COMMON
 )
 
 func GetReportAchievementTypes() []ReportSupportType {
 	return []ReportSupportType{
 		{Name: "None", CN: "无", Value: REPORT_ACHIEVEMENT_TYPE_NONE},
+		{Name: "Common", CN: "常规", Value: REPORT_ACHIEVEMENT_TYPE_COMMON},
 	}
 }
 

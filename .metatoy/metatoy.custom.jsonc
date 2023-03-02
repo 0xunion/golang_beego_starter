@@ -1633,21 +1633,11 @@
         ],
         "actions" : [
             {
-                "type" : "get",
-                "model" : "Gamer",
-                "model_info" : {
-                    "game_id" : "GameId",
-                    "owner" : "$user",
-                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
-                },
-                "dst" : "attacker"
-            },
-            {
                 "type" : "list",
                 "model" : "Attack",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "attack_team_id" : "$attacker.GroupId",
+                    "owner" : "$user",
                     "$page" : "Page",
                     "$page_size" : "PageSize",
                     "$sort" : {
@@ -1764,11 +1754,20 @@
                 "dst" : "gamer"
             },
             {
+                "type" : "get",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "gid" : "$gamer.GroupId",
+                    "game_id" : "game_id"
+                },
+                "dst" : "redteam"
+            },
+            {
                 "type" : "list",
                 "model" : "Report",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "attack_team_id" : "$gamer.GroupId",
+                    "attack_team_id" : "$redteam.Id",
                     "$page" : "page",
                     "$page_size" : "page_size",
                     "$sort" : {
@@ -1831,10 +1830,19 @@
             },
             {
                 "type" : "get",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "gid" : "$gamer.GroupId",
+                    "game_id" : "game_id"
+                },
+                "dst" : "redteam"
+            },
+            {
+                "type" : "get",
                 "model" : "Report",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "attack_team_id" : "$redteam.Id", // ensure the report is belong to the attacker
                     "_id" : "ReportId"
                 },
                 "set" : "report"
@@ -1891,11 +1899,20 @@
                 "dst" : "gamer"
             },
             {
+                "type" : "get",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "gid" : "$gamer.GroupId",
+                    "game_id" : "game_id"
+                },
+                "dst" : "redteam"
+            },
+            {
                 "type" : "delete",
                 "model" : "Report",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "attack_team_id" : "$redteam.Id", // ensure the report is belong to the attacker
                     "_id" : "ReportId"
                 }
             }
@@ -1957,11 +1974,20 @@
                 "dst" : "gamer"
             },
             {
+                "type" : "get",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "gid" : "$gamer.GroupId",
+                    "game_id" : "game_id"
+                },
+                "dst" : "redteam"
+            },
+            {
                 "type" : "update",
                 "model" : "Report",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "attack_team_id" : "$gamer.GroupId", // ensure the report is belong to the attacker
+                    "attack_team_id" : "$redteam.Id", // ensure the report is belong to the attacker
                     "_id" : "ReportId"
                 },
                 "update" : [

@@ -61,6 +61,25 @@ value, err := model.ModelGet[master_types.Gamer](
 
     }
 
+    // get RedTeam
+
+    var D_redteam *master_types.RedTeam
+
+    {
+value, err := model.ModelGet[master_types.RedTeam](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("gid", D_gamer.GroupId),
+                model.MongoKeyFilter("game_id", GameId),
+            ),
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+        D_redteam = value
+
+    }
+
     // get Report
 
 
@@ -68,7 +87,7 @@ value, err := model.ModelGet[master_types.Gamer](
 value, err := model.ModelGet[master_types.Report](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("attack_team_id", D_gamer.GroupId),
+                model.MongoKeyFilter("attack_team_id", D_redteam.Id),
                 model.MongoKeyFilter("_id", ReportId),
             ),
         )
