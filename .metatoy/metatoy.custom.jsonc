@@ -1342,8 +1342,7 @@
                 "model" : "Gamer",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "owner" : "$user",
-                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                    "owner" : "$user"
                 }
             }
         ],
@@ -1525,8 +1524,7 @@
                 "model" : "Gamer",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "owner" : "$user",
-                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                    "owner" : "$user"
                 }
             }
         ],
@@ -2060,8 +2058,7 @@
                 "model" : "Gamer",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "owner" : "$user",
-                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                    "owner" : "$user"
                 }
             }
         ],
@@ -2097,8 +2094,7 @@
                 "model" : "Gamer",
                 "model_info" : {
                     "game_id" : "GameId",
-                    "owner" : "$user",
-                    "identity" : "master_types.GAMER_IDENTITY_DEFENDER"
+                    "owner" : "$user"
                 }
             }
         ],

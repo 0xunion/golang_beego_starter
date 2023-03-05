@@ -26,7 +26,6 @@ func ApiCustomDefenderStatisticsService(
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("owner", user.Id),
-                model.MongoKeyFilter("identity", master_types.GAMER_IDENTITY_DEFENDER),
             ),
         )
         if err == nil && model_instance != nil {

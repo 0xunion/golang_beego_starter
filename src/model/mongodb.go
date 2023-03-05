@@ -214,6 +214,19 @@ func NativeQuery(name string) (*mongo.Cursor, error) {
 	return cursor, nil
 }
 
+// Native Aggregation
+func NativeAggregation(name string, pipeline interface{}) (*mongo.Cursor, error) {
+	if !checkAlive() {
+		return nil, nil
+	}
+	collection := mongoConn.Database(conf.MongoDBName()).Collection(name)
+	cursor, err := collection.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+	return cursor, nil
+}
+
 // ModelGet return the model we want
 func ModelGet[T any](filter MongoFilter) (*T, error) {
 	var result T
