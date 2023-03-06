@@ -1,25 +1,20 @@
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
-	"time"
-
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-)
-
-/* @MT-TPL-IMPORT-END */
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
-// /api/custom/manage/report/comment Service 评论红队提交的报告
-func ApiCustomManageReportCommentService(
+// /api/custom/manage/assets/list Service 列出防守方所有资产
+func ApiCustomManageAssetsListService(
     user *master_types.User,
     GameId master_types.PrimaryId,
-    ReportId master_types.PrimaryId,
-    Comment string,
+    DefenderId master_types.PrimaryId,
 ) (*master_types.MasterResponse) {
-    var apiCustomManageReportCommentResponse struct {
-        Success bool `json:"success"`
+    var apiCustomManageAssetsListResponse struct {
+        Assets any `json:"assets"`
     }
 
     access_controll := false
@@ -44,47 +39,43 @@ func ApiCustomManageReportCommentService(
     }
 
     
-    // get Report
+    // list Asset
+    var D_page int64 = 1
+    var D_limit int64 = 10
+    var D_sort = ""
+    var D_value = 1 // 1: asc, -1: desc
+    D_sort = "_id"
+    D_value = -1
 
 
     {
-_, err := model.ModelGet[master_types.Report](
+        var skip = int64((D_page - 1) * D_limit)
+        var limit = int64(D_limit)
+        value, err := model.ModelGetAll[master_types.Asset](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("_id", ReportId),
+                model.MongoKeyFilter("defender_id", DefenderId),
+                // skip
             ),
+            &model.MongoOptions{
+                Skip:  &skip,
+                Limit: &limit,
+                Sort:  model.MongoSort(D_sort, D_value),
+            },
         )
         if err != nil {
             return master_types.ErrorResponse(-500, err.Error())
         }
 
-
+        apiCustomManageAssetsListResponse.Assets = value
     }
-
-    // create ReportComment
-    var report_comment *master_types.ReportComment = &master_types.ReportComment{
-        GameId: GameId,
-        ReportId: ReportId,
-        Content: Comment,
-        CreateAt: time.Now().Unix(),
-        Owner: user.Id,
-        Role: master_types.REPORT_COMMENT_ROLE_JUDGE,
-    }
-
-    err := model.ModelInsert(report_comment, nil)
-    if err != nil {
-        return master_types.ErrorResponse(-500, err.Error())
-    }
-        
-    // set response directly
-    apiCustomManageReportCommentResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-    return master_types.SuccessResponse(apiCustomManageReportCommentResponse)
+    return master_types.SuccessResponse(apiCustomManageAssetsListResponse)
 }
 
     /* @MT-TPL-SERVICE-RESP-END */

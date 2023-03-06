@@ -18,6 +18,7 @@ func ApiCustomAttackerReportDetailService(
     var apiCustomAttackerReportDetailResponse struct {
         Success bool `json:"success"`
         Report any `json:"report"`
+        Comments any `json:"comments"`
     }
 
     access_controll := false
@@ -97,6 +98,37 @@ value, err := model.ModelGet[master_types.Report](
 
 
         apiCustomAttackerReportDetailResponse.Report = value
+    }
+
+    // list ReportComment
+    var D_page int64 = 1
+    var D_limit int64 = 10
+    var D_sort = ""
+    var D_value = 1 // 1: asc, -1: desc
+    D_sort = "_id"
+    D_value = -1
+
+
+    {
+        var skip = int64((D_page - 1) * D_limit)
+        var limit = int64(D_limit)
+        value, err := model.ModelGetAll[master_types.ReportComment](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("report_id", ReportId),
+                // skip
+            ),
+            &model.MongoOptions{
+                Skip:  &skip,
+                Limit: &limit,
+                Sort:  model.MongoSort(D_sort, D_value),
+            },
+        )
+        if err != nil {
+            return master_types.ErrorResponse(-500, err.Error())
+        }
+
+        apiCustomAttackerReportDetailResponse.Comments = value
     }
 /* @MT-TPL-SERVICE-END */
 

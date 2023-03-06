@@ -28,7 +28,6 @@ func ApiCustomAttackerAttackSectionService(
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("owner", user.Id),
-                model.MongoKeyFilter("identity", master_types.GAMER_IDENTITY_ATTACKER),
             ),
         )
         if err == nil && model_instance != nil {

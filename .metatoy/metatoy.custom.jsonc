@@ -846,6 +846,72 @@
         "description_cn" : "获取红队提交的报告列表"
     },
     {
+        "route" : "/api/custom/manage/report/detail",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "report_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "get",
+                "model" : "Report",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "ReportId"
+                },
+                "set" : "report"
+            },
+            {
+                "type" : "list",
+                "model" : "ReportComment",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "report_id" : "ReportId",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
+                    },
+                    "$limit" : "100",
+                    "$page" : "1"
+                },
+                "set" : "comments"
+            }
+        ],
+        "response" : {
+            "success" : "bool",
+            "report" : "any",
+            "comments" : "any"
+        },
+        "description" : "get report detail",
+        "description_cn" : "获取攻击报告详情"
+    },
+    {
         "route" : "/api/custom/manage/report/accept",
         "method" : "post",
         "args" : {
@@ -1028,7 +1094,8 @@
                     "report_id" : "report_id",
                     "content" : "comment",
                     "create_at" : "$time",
-                    "owner" : "$user"
+                    "owner" : "$user",
+                    "role" : "master_types.REPORT_COMMENT_ROLE_JUDGE"
                 }
             },
             {
@@ -1080,7 +1147,6 @@
             }
         ],
         "actions" : [
-            // first get report then update report state, finally, create ReportComment
             {
                 "type" : "get",
                 "model" : "Report",
@@ -1098,7 +1164,8 @@
                     "report_id" : "report_id",
                     "content" : "comment",
                     "create_at" : "$time",
-                    "owner" : "$user"
+                    "owner" : "$user",
+                    "role" : "master_types.REPORT_COMMENT_ROLE_JUDGE"
                 }
             },
             {
@@ -1113,6 +1180,59 @@
         },
         "description" : "comment report",
         "description_cn" : "评论红队提交的报告"
+    },
+    {
+        "route" : "/api/custom/manage/assets/list",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            },
+            "defender_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "admin"
+            },
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "list",
+                "model" : "Asset",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "defender_id" : "defender_id",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "assets"
+            }
+        ],
+        "response" : {
+            "assets" : "any"
+        },
+        "description" : "list assets",
+        "description_cn" : "列出防守方所有资产"
     },
     {
         "route" : "/api/custom/manage/attack/accept",
@@ -1844,11 +1964,26 @@
                     "_id" : "ReportId"
                 },
                 "set" : "report"
+            },
+            {
+                "type" : "list",
+                "model" : "ReportComment",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "report_id" : "ReportId",
+                    "$sort" : {
+                        "type" : "const",
+                        "field" : "_id",
+                        "value" : "-1"
+                    }
+                },
+                "set" : "comments"
             }
         ],
         "response" : {
             "success" : "bool",
-            "report" : "any"
+            "report" : "any",
+            "comments" : "any"
         },
         "description" : "get report detail",
         "description_cn" : "获取攻击报告详情"
@@ -2004,7 +2139,8 @@
                     "report_id" : "ReportId",
                     "owner" : "$user",
                     "content" : "Reason",
-                    "create_at" : "$time"
+                    "create_at" : "$time",
+                    "role" : "master_types.REPORT_COMMENT_ROLE_USER"
                 }
             }
         ],

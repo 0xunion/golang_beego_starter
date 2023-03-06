@@ -113,6 +113,7 @@ value, err := model.ModelGet[master_types.RedTeam](
         Owner: user.Id,
         Content: Reason,
         CreateAt: time.Now().Unix(),
+        Role: master_types.REPORT_COMMENT_ROLE_USER,
     }
 
     err := model.ModelInsert(report_comment, nil)

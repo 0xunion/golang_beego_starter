@@ -53,6 +53,8 @@ func registerCommon() {
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
+    beego.Router("/api/custom/manage/assets/list", &custom.ApiCustomManageAssetsListController{})
+    beego.Router("/api/custom/manage/report/detail", &custom.ApiCustomManageReportDetailController{})
     beego.Router("/api/custom/admin/gamer/list", &custom.ApiCustomAdminGamerListController{})
     beego.Router("/api/custom/admin/game/update", &custom.ApiCustomAdminGameUpdateController{})
     beego.Router("/api/custom/all/game/detail", &custom.ApiCustomAllGameDetailController{})

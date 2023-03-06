@@ -149,4 +149,10 @@ type ReportComment struct {
 	ReportId PrimaryId `json:"report_id" bson:"report_id"`
 	Content  string    `json:"content" bson:"content"`
 	CreateAt int64     `json:"create_at" bson:"create_at"`
+	Role     int       `json:"role" bson:"role"`
 }
+
+const (
+	REPORT_COMMENT_ROLE_USER = iota
+	REPORT_COMMENT_ROLE_JUDGE
+)

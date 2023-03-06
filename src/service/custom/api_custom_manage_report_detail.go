@@ -1,25 +1,22 @@
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
-	"time"
-
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-)
-
-/* @MT-TPL-IMPORT-END */
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
-// /api/custom/manage/report/reject Service 驳回红队提交的报告
-func ApiCustomManageReportRejectService(
+// /api/custom/manage/report/detail Service 获取攻击报告详情
+func ApiCustomManageReportDetailService(
     user *master_types.User,
     GameId master_types.PrimaryId,
     ReportId master_types.PrimaryId,
-    Comment string,
 ) (*master_types.MasterResponse) {
-    var apiCustomManageReportRejectResponse struct {
+    var apiCustomManageReportDetailResponse struct {
         Success bool `json:"success"`
+        Report any `json:"report"`
+        Comments any `json:"comments"`
     }
 
     access_controll := false
@@ -48,7 +45,7 @@ func ApiCustomManageReportRejectService(
 
 
     {
-_, err := model.ModelGet[master_types.Report](
+value, err := model.ModelGet[master_types.Report](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("_id", ReportId),
@@ -59,55 +56,50 @@ _, err := model.ModelGet[master_types.Report](
         }
 
 
+        apiCustomManageReportDetailResponse.Report = value
     }
 
-    // update Report
-    
+    // list ReportComment
+    var D_page int64 = 1
+    var D_limit int64 = 10
+    var D_sort = ""
+    var D_value = 1 // 1: asc, -1: desc
+    D_sort = "_id"
+    D_value = -1
+    D_limit = int64(100)
+    D_page = int64(1)
+
+
     {
-        err := model.ModelUpdateField[master_types.Report](
+        var skip = int64((D_page - 1) * D_limit)
+        var limit = int64(D_limit)
+        value, err := model.ModelGetAll[master_types.ReportComment](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("_id", ReportId),
-                model.MongoKeyFilter("state", master_types.REPORT_STATE_UNVERIFIED),
+                model.MongoKeyFilter("report_id", ReportId),
+                // skip
+                // skip
+                // skip
             ),
-
-
-
-            model.MongoSetField(
-                "state", 
-                master_types.REPORT_STATE_REJECTED,
-            ),
+            &model.MongoOptions{
+                Skip:  &skip,
+                Limit: &limit,
+                Sort:  model.MongoSort(D_sort, D_value),
+            },
         )
-
         if err != nil {
             return master_types.ErrorResponse(-500, err.Error())
         }
-    }
 
-    // create ReportComment
-    var report_comment *master_types.ReportComment = &master_types.ReportComment{
-        GameId: GameId,
-        ReportId: ReportId,
-        Content: Comment,
-        CreateAt: time.Now().Unix(),
-        Owner: user.Id,
-        Role: master_types.REPORT_COMMENT_ROLE_JUDGE,
+        apiCustomManageReportDetailResponse.Comments = value
     }
-
-    err := model.ModelInsert(report_comment, nil)
-    if err != nil {
-        return master_types.ErrorResponse(-500, err.Error())
-    }
-        
-    // set response directly
-    apiCustomManageReportRejectResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-    return master_types.SuccessResponse(apiCustomManageReportRejectResponse)
+    return master_types.SuccessResponse(apiCustomManageReportDetailResponse)
 }
 
     /* @MT-TPL-SERVICE-RESP-END */
