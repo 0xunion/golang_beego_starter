@@ -49,20 +49,22 @@ func registerCommon() {
 	beego.Router("/api/common/attacker/file/upload", &common.AttackerCreateFileController{})
 	beego.Router("/api/common/admin/file/upload", &common.AdminUploadFileController{})
 	beego.Router("/api/common/file/download", &common.GetFileController{})
+	beego.Router("/api/common/image/upload", &common.UploadImageController{})
+	beego.Router("/api/common/image/download", &common.GetImageController{})
 }
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
-    beego.Router("/api/custom/manage/assets/list", &custom.ApiCustomManageAssetsListController{})
-    beego.Router("/api/custom/manage/report/detail", &custom.ApiCustomManageReportDetailController{})
-    beego.Router("/api/custom/admin/gamer/list", &custom.ApiCustomAdminGamerListController{})
-    beego.Router("/api/custom/admin/game/update", &custom.ApiCustomAdminGameUpdateController{})
-    beego.Router("/api/custom/all/game/detail", &custom.ApiCustomAllGameDetailController{})
-    beego.Router("/api/custom/attacker/report/commit", &custom.ApiCustomAttackerReportCommitController{})
-    beego.Router("/api/custom/defender/statistics", &custom.ApiCustomDefenderStatisticsController{})
-    beego.Router("/api/custom/attacker/statistics", &custom.ApiCustomAttackerStatisticsController{})
-    beego.Router("/api/custom/all/game/list", &custom.ApiCustomAllGameListController{})
-    beego.Router("/api/custom/manage/rank/blue_team", &custom.ApiCustomManageRankBlueTeamController{})
+	beego.Router("/api/custom/manage/assets/list", &custom.ApiCustomManageAssetsListController{})
+	beego.Router("/api/custom/manage/report/detail", &custom.ApiCustomManageReportDetailController{})
+	beego.Router("/api/custom/admin/gamer/list", &custom.ApiCustomAdminGamerListController{})
+	beego.Router("/api/custom/admin/game/update", &custom.ApiCustomAdminGameUpdateController{})
+	beego.Router("/api/custom/all/game/detail", &custom.ApiCustomAllGameDetailController{})
+	beego.Router("/api/custom/attacker/report/commit", &custom.ApiCustomAttackerReportCommitController{})
+	beego.Router("/api/custom/defender/statistics", &custom.ApiCustomDefenderStatisticsController{})
+	beego.Router("/api/custom/attacker/statistics", &custom.ApiCustomAttackerStatisticsController{})
+	beego.Router("/api/custom/all/game/list", &custom.ApiCustomAllGameListController{})
+	beego.Router("/api/custom/manage/rank/blue_team", &custom.ApiCustomManageRankBlueTeamController{})
 	beego.Router("/api/custom/manage/rank/red_team", &custom.ApiCustomManageRankRedTeamController{})
 	beego.Router("api/custom/admin/game/template/judge", &custom.ApiCustomAdminGameTemplateJudgeController{})
 	beego.Router("/api/custom/admin/game/list", &custom.ApiCustomAdminGameListController{})
@@ -95,5 +97,5 @@ func registerCustom() {
 	beego.Router("/api/custom/admin/game/import/defender", &custom.ApiCustomAdminGameImportDefenderController{})
 	beego.Router("/api/custom/admin/game/template/red_team", &custom.ApiCustomAdminGameTemplateRedTeamController{})
 	beego.Router("/api/custom/admin/game/create", &custom.ApiCustomAdminGameCreateController{})
-    /* @MT-TPL-ROUTE-CUSTOM-END */
+	/* @MT-TPL-ROUTE-CUSTOM-END */
 }

@@ -147,3 +147,55 @@ func (c *GetFileController) Get() {
 
 	c.Ctx.Output.Download(path)
 }
+
+type UploadImageController struct {
+	beego.Controller
+}
+
+func (c *UploadImageController) Post() {
+	user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+	user := user_interface.(*master_types.User)
+
+	file, header, err := c.GetFile("file")
+	if err != nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+		return
+	}
+
+	hash, err := master_servce.UploadImageService(
+		user,
+		file,
+		header,
+	)
+
+	if err != nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+		return
+	}
+
+	c.Ctx.Output.JSON(master_types.SuccessResponse(hash), true, false)
+}
+
+type GetImageController struct {
+	beego.Controller
+}
+
+func (c *GetImageController) Get() {
+	hash := c.GetString("hash")
+
+	path, err := master_servce.GetImageService(
+		hash,
+	)
+
+	if err != nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+		return
+	}
+
+	c.Ctx.Output.Download(path)
+}

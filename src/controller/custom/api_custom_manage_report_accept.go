@@ -30,8 +30,8 @@ func (c *ApiCustomManageReportAcceptController) Post() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Score int `json:"score" form:"score" valid:"Required"`
-        DefenderScore int `json:"defender_score" form:"defender_score" valid:"Required"`
+        Score int `json:"score" form:"score" valid:""`
+        DefenderScore int `json:"defender_score" form:"defender_score" valid:""`
     }
 
 

@@ -29,9 +29,9 @@ func (c *ApiCustomManageReportListController) Get() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Page int `json:"page" form:"page" valid:"Required"`
-        PageSize int `json:"page_size" form:"page_size" valid:"Required"`
-        Order int `json:"order" form:"order" valid:"Required"`
+        Page int `json:"page" form:"page" valid:""`
+        PageSize int `json:"page_size" form:"page_size" valid:""`
+        Order int `json:"order" form:"order" valid:""`
     }
 
 

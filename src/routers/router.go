@@ -31,6 +31,7 @@ func init() {
 		// check header for Authorization
 		// if found, just get user info from cache
 		token := ctx.Input.Header("Authorization")
+
 		if token != "" {
 			login_token := auth.NewAuthTokenWithToken(token)
 			// check if token is valid

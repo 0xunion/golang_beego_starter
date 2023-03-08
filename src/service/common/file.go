@@ -211,6 +211,7 @@ func GetFileService(user *types.User, game_id types.PrimaryId, fileId types.Prim
 		model.NewMongoFilter(
 			model.IdFilter(fileId),
 			model.MongoKeyFilter("game_id", game_id),
+			model.MongoKeyFilter("type", types.FILE_TYPE_UNKNOWN),
 		),
 	)
 
@@ -246,6 +247,69 @@ func GetFileService(user *types.User, game_id types.PrimaryId, fileId types.Prim
 
 	if !access_controll {
 		return "", errors.New("permission denied")
+	}
+
+	return file.Path, nil
+}
+
+func UploadImageService(user *types.User, file multipart.File, header *multipart.FileHeader) (string, error) {
+	// check size
+	if header.Size > 1024*1024*40 {
+		return "", errors.New("file size too large")
+	}
+
+	// save file
+	random_hash := hash.Md5("rand-" + strconv.Itoa(num.Random(100000, 999999)) + "-" + strconv.FormatInt(time.Now().Unix(), 16))
+	date := time.Now().Format("2006-01-02")
+
+	file_path := "storage/upload/" + date + "/" + random_hash + path.Ext(header.Filename)
+
+	file_obj := &types.File{
+		Owner:    user.Id,
+		Hash:     random_hash,
+		Size:     header.Size,
+		Path:     file_path,
+		CreateAt: time.Now().Unix(),
+		Type:     types.FILE_TYPE_IMAGE,
+	}
+
+	file_obj.SetJudgementAccess()
+	file_obj.SetPartAAccess()
+
+	var id types.PrimaryId
+	err := model.ModelInsert(file_obj, &id)
+	if err != nil {
+		return "", err
+	}
+
+	// copy to disk
+	os.MkdirAll("storage/upload/"+date+"/", 0777)
+	// open file
+	file_disk, err := os.OpenFile(file_path, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return "", err
+	}
+	defer file_disk.Close()
+
+	// copy
+	_, err = io.Copy(file_disk, file)
+	if err != nil {
+		return "", err
+	}
+
+	return random_hash, nil
+}
+
+func GetImageService(hash string) (string, error) {
+	file, err := model.ModelGet[types.File](
+		model.NewMongoFilter(
+			model.MongoKeyFilter("hash", hash),
+			model.MongoKeyFilter("type", types.FILE_TYPE_IMAGE),
+		),
+	)
+
+	if err != nil {
+		return "", err
 	}
 
 	return file.Path, nil

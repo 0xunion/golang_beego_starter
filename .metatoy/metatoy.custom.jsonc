@@ -818,6 +818,15 @@
                     "owner" : "$user",
                     "identity" : "master_types.GAMER_IDENTITY_JUDGEMENT"
                 }
+            },
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_PARTA"
+                }
             }
         ],
         "actions" : [

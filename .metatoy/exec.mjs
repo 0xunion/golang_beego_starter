@@ -58,7 +58,7 @@ if (command_name?.toLocaleLowerCase() == 'custom')
         {
             // check validate has required
             for (let [key, value] of Object.entries(custom.args)) {
-                if( !value.validate.required ) {
+                if( !value.validate.required && value.type != 'int' ) {
                     value.validate.required = true;
                 }
             }

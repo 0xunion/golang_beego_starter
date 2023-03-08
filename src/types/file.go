@@ -9,6 +9,7 @@ type File struct {
 	Role     int64     `json:"role" bson:"role"` // permission control
 	Size     int64     `json:"size" bson:"size"`
 	Path     string    `json:"path" bson:"path"`
+	Type     int64     `json:"type" bson:"type"`
 	GameId   PrimaryId `json:"game_id" bson:"game_id"`
 	CreateAt int64     `json:"create_at" bson:"create_at"`
 }
@@ -20,6 +21,11 @@ const (
 	FILE_ROLE_JUDGEMENT
 	FILE_ROLE_CUSTOMER
 	FILE_ROLE_PARTA
+)
+
+const (
+	FILE_TYPE_UNKNOWN = iota
+	FILE_TYPE_IMAGE
 )
 
 func (f *File) PublicAccess() bool {

@@ -31,12 +31,12 @@ func (c *ApiCustomAttackerReportCommitController) Post() {
 
     var request_params struct {
         Content string `json:"content" form:"content" valid:"Required;MinSize(1);MaxSize(16384)"`
-        IsolationBreak int `json:"isolation_break" form:"isolation_break" valid:"Min(0);Max(1);Required"`
-        VulnType int `json:"vuln_type" form:"vuln_type" valid:"Min(0);Max(9);Required"`
-        AchievementType int `json:"achievement_type" form:"achievement_type" valid:"Min(0);Max(1);Required"`
-        AttackType int `json:"attack_type" form:"attack_type" valid:"Min(0);Max(5);Required"`
+        IsolationBreak int `json:"isolation_break" form:"isolation_break" valid:"Min(0);Max(1)"`
+        VulnType int `json:"vuln_type" form:"vuln_type" valid:"Min(0);Max(9)"`
+        AchievementType int `json:"achievement_type" form:"achievement_type" valid:"Min(0);Max(1)"`
+        AttackType int `json:"attack_type" form:"attack_type" valid:"Min(0);Max(5)"`
         Uri string `json:"uri" form:"uri" valid:"MinSize(0);MaxSize(256);Required"`
-        VulnLevel int `json:"vuln_level" form:"vuln_level" valid:"Min(0);Max(3);Required"`
+        VulnLevel int `json:"vuln_level" form:"vuln_level" valid:"Min(0);Max(3)"`
         Name string `json:"name" form:"name" valid:"MinSize(0);MaxSize(256);Required"`
     }
 

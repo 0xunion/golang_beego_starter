@@ -29,8 +29,8 @@ func (c *ApiCustomAttackerReportListController) Get() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Page int `json:"page" form:"page" valid:"Required"`
-        PageSize int `json:"page_size" form:"page_size" valid:"Required"`
+        Page int `json:"page" form:"page" valid:""`
+        PageSize int `json:"page_size" form:"page_size" valid:""`
     }
 
 
