@@ -108,12 +108,12 @@ const (
 
 func GetReportVulnTypes() []ReportSupportType {
 	return []ReportSupportType{
-		{Name: "None", CN: "无", Value: REPORT_VULN_TYPE_NONE},
-		{Name: "XSS", CN: "XSS", Value: REPORT_VULN_TYPE_XSS},
+		{Name: "None", CN: "弱密码", Value: REPORT_VULN_TYPE_NONE},
+		{Name: "XSS", CN: "跨站脚本", Value: REPORT_VULN_TYPE_XSS},
 		{Name: "SQLI", CN: "SQL注入", Value: REPORT_VULN_TYPE_SQLI},
 		{Name: "RCE", CN: "远程命令执行", Value: REPORT_VULN_TYPE_RCE},
 		{Name: "LFI", CN: "本地文件包含", Value: REPORT_VULN_TYPE_LFI},
-		{Name: "XXE", CN: "XML外部实体注入", Value: REPORT_VULN_TYPE_XXE},
+		{Name: "XXE", CN: "外部实体注入", Value: REPORT_VULN_TYPE_XXE},
 		{Name: "CSRF", CN: "CSRF", Value: REPORT_VULN_TYPE_CSRF},
 		{Name: "SSTI", CN: "模板注入", Value: REPORT_VULN_TYPE_SSTI},
 		{Name: "RFI", CN: "远程文件包含", Value: REPORT_VULN_TYPE_RFI},
@@ -132,7 +132,7 @@ const (
 
 func GetReportAttackTypes() []ReportSupportType {
 	return []ReportSupportType{
-		{Name: "None", CN: "无", Value: REPORT_ATTACK_TYPE_NONE},
+		{Name: "None", CN: "常规", Value: REPORT_ATTACK_TYPE_NONE},
 		{Name: "Social Engineering", CN: "社会工程学", Value: REPORT_ATTACK_TYPE_SOCIAL_ENGINEERING},
 		{Name: "Physical", CN: "物理", Value: REPORT_ATTACK_TYPE_PHYSICAL},
 		{Name: "Nday", CN: "Nday", Value: REPORT_ATTACK_TYPE_NDAY},
@@ -156,3 +156,17 @@ const (
 	REPORT_COMMENT_ROLE_USER = iota
 	REPORT_COMMENT_ROLE_JUDGE
 )
+
+type TraceReport struct {
+	BasicType
+	Id           PrimaryId `json:"id" bson:"_id,omitempty"`
+	Owner        PrimaryId `json:"owner" bson:"owner"`
+	Title        string    `json:"title" bson:"title"`
+	GameId       PrimaryId `json:"game_id" bson:"game_id"`
+	AttackTeamId PrimaryId `json:"attack_team_id" bson:"attack_team_id"`
+	DefenderId   PrimaryId `json:"defender_id" bson:"defender_id"`
+	Score        int64     `json:"score" bson:"score"`
+	State        int       `json:"state" bson:"state"`
+	CreateAt     int64     `json:"create_at" bson:"create_at"`
+	Content      string    `json:"content" bson:"content"`
+}

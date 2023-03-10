@@ -6,39 +6,40 @@ import (
 	master_types "github.com/0xunion/exercise_back/src/types"
 	"github.com/0xunion/exercise_back/src/util/strings"
 	"go.mongodb.org/mongo-driver/bson"
-	/* @MT-TPL-IMPORT-TIME-START */ /* @MT-TPL-IMPORT-TIME-END */)
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
 // /api/custom/attacker/statistics Service 红队获取统计信息
 func ApiCustomAttackerStatisticsService(
-	user *master_types.User,
-	GameId master_types.PrimaryId,
-) *master_types.MasterResponse {
-	var apiCustomAttackerStatisticsResponse struct {
-		Success    bool `json:"success"`
-		Statistics any  `json:"statistics"`
-	}
+    user *master_types.User,
+    GameId master_types.PrimaryId,
+) (*master_types.MasterResponse) {
+    var apiCustomAttackerStatisticsResponse struct {
+        Success bool `json:"success"`
+        Statistics any `json:"statistics"`
+    }
 
-	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
-	if !access_controll {
-		model_instance, err := model.ModelGet[master_types.Gamer](
-			model.NewMongoFilter(
-				model.MongoKeyFilter("game_id", GameId),
-				model.MongoKeyFilter("owner", user.Id),
-			),
-		)
-		if err == nil && model_instance != nil {
-			access_controll = true
-		}
-	}
+    access_controll := false
+    if !access_controll && user.IsAdmin() {
+        access_controll = true
+    }
+    if !access_controll {
+        model_instance, err := model.ModelGet[master_types.Gamer](
+            model.NewMongoFilter(
+                model.MongoKeyFilter("game_id", GameId),
+                model.MongoKeyFilter("owner", user.Id),
+            ),
+        )
+        if err == nil && model_instance != nil {
+            access_controll = true
+        }
+    }
 
-	if !access_controll {
-		return master_types.ErrorResponse(-403, "Permission denied")
-	}
-	/* @MT-TPL-SERVICE-END */
+    if !access_controll {
+        return master_types.ErrorResponse(-403, "Permission denied")
+    }
+/* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 	var statistics struct {
@@ -67,10 +68,15 @@ func ApiCustomAttackerStatisticsService(
 				Count int64  `json:"count" bson:"count"`
 			} `json:"industry" bson:"industry"`
 		} `json:"attack_types" bson:"attack_types"`
+		DefenderReverseRank []struct {
+			Defender types.Defender `json:"defender" bson:"defender"`
+			Count    int64          `json:"count" bson:"count"`
+		} `json:"defender_reverse_rank" bson:"defender_reverse_rank"`
 		Rank struct {
 			RedTeam  []types.RedTeam  `json:"red_team" bson:"red_team"`
 			BlueTeam []types.Defender `json:"blue_team" bson:"blue_team"`
 		} `json:"rank" bson:"rank"`
+		Boardcast []types.Boardcast `json:"boardcast" bson:"boardcast"`
 	}
 
 	// get all reports
@@ -240,13 +246,63 @@ func ApiCustomAttackerStatisticsService(
 		return master_types.ErrorResponse(-500, err.Error())
 	}
 
+	var defender_map = make(map[master_types.PrimaryId]*struct {
+		Defender types.Defender `json:"defender" bson:"defender"`
+		Count    int64          `json:"count" bson:"count"`
+	})
+	for defenders_index := range defenders {
+		defender := defenders[defenders_index]
+		defender_map[defender.Id] = &struct {
+			Defender types.Defender `json:"defender" bson:"defender"`
+			Count    int64          `json:"count" bson:"count"`
+		}{
+			Defender: defender,
+			Count:    0,
+		}
+	}
+
+	// statistics reverse defender
+	for _, report := range reports {
+		if report.State == master_types.REPORT_STATE_ACCEPTED {
+			defender := defender_map[report.DefenderId]
+			defender.Count++
+		}
+	}
+
+	// set reverse defender
+	for _, defender := range defender_map {
+		statistics.DefenderReverseRank = append(statistics.DefenderReverseRank, struct {
+			Defender types.Defender `json:"defender" bson:"defender"`
+			Count    int64          `json:"count" bson:"count"`
+		}{
+			Defender: defender.Defender,
+			Count:    defender.Count,
+		})
+	}
+
 	statistics.Rank.RedTeam = red_team
+
+	// get boardcast
+	boardcasts, err := model.ModelGetAll[master_types.Boardcast](
+		model.NewMongoFilter(
+			model.MongoKeyFilter("game_id", GameId),
+		),
+		&model.MongoOptions{
+			Sort: model.MongoSort("create_at", -1),
+		},
+	)
+
+	if err != nil {
+		return master_types.ErrorResponse(-500, err.Error())
+	}
+
+	statistics.Boardcast = boardcasts
 
 	apiCustomAttackerStatisticsResponse.Statistics = statistics
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-	return master_types.SuccessResponse(apiCustomAttackerStatisticsResponse)
+    return master_types.SuccessResponse(apiCustomAttackerStatisticsResponse)
 }
 
-/* @MT-TPL-SERVICE-RESP-END */
+    /* @MT-TPL-SERVICE-RESP-END */

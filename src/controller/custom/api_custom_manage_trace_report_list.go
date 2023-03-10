@@ -15,11 +15,11 @@ import (
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomManageReportListController struct {
+type ApiCustomManageTraceReportListController struct {
     beego.Controller
 }
 
-func (c *ApiCustomManageReportListController) Get() {
+func (c *ApiCustomManageTraceReportListController) Get() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -29,11 +29,10 @@ func (c *ApiCustomManageReportListController) Get() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Page int `json:"page" form:"page" valid:""`
-        PageSize int `json:"page_size" form:"page_size" valid:""`
-        Order int `json:"order" form:"order" valid:""`
-        State int `json:"state" form:"state" valid:""`
-        Title string `json:"title" form:"title" valid:""`
+        Page int64 `json:"page" form:"page" valid:"Required"`
+        PageSize int64 `json:"page_size" form:"page_size" valid:"Required"`
+        State int64 `json:"state" form:"state" valid:""`
+        Content string `json:"content" form:"content" valid:""`
     }
 
 
@@ -48,18 +47,17 @@ func (c *ApiCustomManageReportListController) Get() {
         return
     }
 
-    response := custom_service.ApiCustomManageReportListService(
+    response := custom_service.ApiCustomManageTraceReportListService(
         user,
         request_params_game_id,
         request_params.Page,
         request_params.PageSize,
-        request_params.Order,
         request_params.State,
-        request_params.Title,
+        request_params.Content,
     )
 /* @MT-TPL-CONTROLLER-END */
 
-	/* @MT-TPL-CONTROLLER-RESPONSE-START */
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
 
     c.Ctx.Output.JSON(response, true, false)
 }

@@ -10,16 +10,17 @@ import (
     custom_service "github.com/0xunion/exercise_back/src/service/custom"
     
 
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 /* @MT-TPL-IMPORT-END */
 
 /* @MT-TPL-CONTROLLER-START */
-type ApiCustomManageReportListController struct {
+type ApiCustomManageTraceReportAcceptController struct {
     beego.Controller
 }
 
-func (c *ApiCustomManageReportListController) Get() {
+func (c *ApiCustomManageTraceReportAcceptController) Post() {
     user_interface := c.Ctx.Input.GetData("user")
 	if user_interface == nil {
 		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
@@ -29,15 +30,17 @@ func (c *ApiCustomManageReportListController) Get() {
     user := user_interface.(*master_types.User)
 
     var request_params struct {
-        Page int `json:"page" form:"page" valid:""`
-        PageSize int `json:"page_size" form:"page_size" valid:""`
-        Order int `json:"order" form:"order" valid:""`
-        State int `json:"state" form:"state" valid:""`
-        Title string `json:"title" form:"title" valid:""`
+        Score int `json:"score" form:"score" valid:""`
+        AttackScore int `json:"attack_score" form:"attack_score" valid:""`
     }
 
 
     request_params_game_id, err := primitive.ObjectIDFromHex(c.GetString("game_id"))
+    if err != nil {
+        c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
+        return
+    }
+    request_params_report_id, err := primitive.ObjectIDFromHex(c.GetString("report_id"))
     if err != nil {
         c.Ctx.Output.JSON(master_types.ErrorResponse(-400, err.Error()), true, false)
         return
@@ -48,18 +51,16 @@ func (c *ApiCustomManageReportListController) Get() {
         return
     }
 
-    response := custom_service.ApiCustomManageReportListService(
+    response := custom_service.ApiCustomManageTraceReportAcceptService(
         user,
         request_params_game_id,
-        request_params.Page,
-        request_params.PageSize,
-        request_params.Order,
-        request_params.State,
-        request_params.Title,
+        request_params_report_id,
+        request_params.Score,
+        request_params.AttackScore,
     )
 /* @MT-TPL-CONTROLLER-END */
 
-	/* @MT-TPL-CONTROLLER-RESPONSE-START */
+    /* @MT-TPL-CONTROLLER-RESPONSE-START */
 
     c.Ctx.Output.JSON(response, true, false)
 }

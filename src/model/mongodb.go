@@ -42,6 +42,13 @@ func MongoKeyFilter(key string, value interface{}) MongoFilterItem {
 	return MongoFilterItem{Key: key, Value: value}
 }
 
+// search filter
+func MongoSearchFilter(key string, value string) MongoFilterItem {
+	// replace / to \/
+	value = gostrings.ReplaceAll(value, "/", "\\/")
+	return MongoFilterItem{Key: key, Value: bson.M{"$regex": value, "$options": "-i"}}
+}
+
 // bit filter
 func MongoNoBitFilter(key string, value int) MongoFilterItem {
 	return MongoFilterItem{Key: key, Value: bson.M{"$bitsAllClear": value}}

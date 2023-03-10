@@ -32,6 +32,7 @@ func (c *ApiCustomAdminGameCreateController) Post() {
         HeaderHtml string `json:"header_html" form:"header_html" valid:"MinSize(3);MaxSize(1024);Required"`
         StartTime int64 `json:"start_time" form:"start_time" valid:"Required"`
         EndTime int64 `json:"end_time" form:"end_time" valid:"Required"`
+        PositionCode string `json:"position_code" form:"position_code" valid:"MinSize(3);MaxSize(64);Required"`
     }
 
 
@@ -48,6 +49,7 @@ func (c *ApiCustomAdminGameCreateController) Post() {
         request_params.HeaderHtml,
         request_params.StartTime,
         request_params.EndTime,
+        request_params.PositionCode,
     )
 /* @MT-TPL-CONTROLLER-END */
 

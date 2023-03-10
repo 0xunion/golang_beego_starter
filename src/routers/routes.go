@@ -55,7 +55,19 @@ func registerCommon() {
 
 func registerCustom() {
 	/* @MT-TPL-ROUTE-CUSTOM-START */
-	beego.Router("/api/custom/manage/assets/list", &custom.ApiCustomManageAssetsListController{})
+    beego.Router("/api/custom/defender/attacker/list", &custom.ApiCustomDefenderAttackerListController{})
+    beego.Router("/api/custom/manage/trace_report/reject", &custom.ApiCustomManageTraceReportRejectController{})
+    beego.Router("/api/custom/manage/trace_report/accept", &custom.ApiCustomManageTraceReportAcceptController{})
+    beego.Router("/api/custom/manage/trace_report/detail", &custom.ApiCustomManageTraceReportDetailController{})
+    beego.Router("/api/custom/manage/trace_report/list", &custom.ApiCustomManageTraceReportListController{})
+    beego.Router("/api/custom/defender/report/submit", &custom.ApiCustomDefenderReportSubmitController{})
+    beego.Router("/api/custom/defender/report/detail", &custom.ApiCustomDefenderReportDetailController{})
+    beego.Router("/api/custom/defender/report/list", &custom.ApiCustomDefenderReportListController{})
+    beego.Router("/api/custom/defender/assets/list", &custom.ApiCustomDefenderAssetsListController{})
+    beego.Router("/api/custom/manage/attack/list", &custom.ApiCustomManageAttackListController{})
+    beego.Router("/api/custom/all/boardcast/list", &custom.ApiCustomAllBoardcastListController{})
+    beego.Router("/api/custom/manage/boardcast/publish", &custom.ApiCustomManageBoardcastPublishController{})
+    beego.Router("/api/custom/manage/assets/list", &custom.ApiCustomManageAssetsListController{})
 	beego.Router("/api/custom/manage/report/detail", &custom.ApiCustomManageReportDetailController{})
 	beego.Router("/api/custom/admin/gamer/list", &custom.ApiCustomAdminGamerListController{})
 	beego.Router("/api/custom/admin/game/update", &custom.ApiCustomAdminGameUpdateController{})
@@ -97,5 +109,5 @@ func registerCustom() {
 	beego.Router("/api/custom/admin/game/import/defender", &custom.ApiCustomAdminGameImportDefenderController{})
 	beego.Router("/api/custom/admin/game/template/red_team", &custom.ApiCustomAdminGameTemplateRedTeamController{})
 	beego.Router("/api/custom/admin/game/create", &custom.ApiCustomAdminGameCreateController{})
-	/* @MT-TPL-ROUTE-CUSTOM-END */
+    /* @MT-TPL-ROUTE-CUSTOM-END */
 }

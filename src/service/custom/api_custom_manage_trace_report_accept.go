@@ -1,33 +1,25 @@
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
-	"strconv"
-	"time"
-
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-)
-
-/* @MT-TPL-IMPORT-END */
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
 /* @MT-TPL-SERVICE-START */
-// /api/custom/manage/report/accept Service 为红队提交的报告打分
-func ApiCustomManageReportAcceptService(
+// /api/custom/manage/trace_report/accept Service 裁判接受溯源报告
+func ApiCustomManageTraceReportAcceptService(
     user *master_types.User,
     GameId master_types.PrimaryId,
     ReportId master_types.PrimaryId,
     Score int,
-    DefenderScore int,
+    AttackScore int,
 ) (*master_types.MasterResponse) {
-    var apiCustomManageReportAcceptResponse struct {
+    var apiCustomManageTraceReportAcceptResponse struct {
         Success bool `json:"success"`
     }
 
     access_controll := false
-    if !access_controll && user.IsAdmin() {
-        access_controll = true
-    }
     if !access_controll {
         model_instance, err := model.ModelGet[master_types.Gamer](
             model.NewMongoFilter(
@@ -46,12 +38,12 @@ func ApiCustomManageReportAcceptService(
     }
 
     
-    // get Report
+    // get TraceReport
 
-    var D_report *master_types.Report
+    var D_report *master_types.TraceReport
 
     {
-value, err := model.ModelGet[master_types.Report](
+value, err := model.ModelGet[master_types.TraceReport](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("_id", ReportId),
@@ -65,14 +57,13 @@ value, err := model.ModelGet[master_types.Report](
 
     }
 
-    // update Report
+    // update TraceReport
     
     {
-        err := model.ModelUpdateField[master_types.Report](
+        err := model.ModelUpdateField[master_types.TraceReport](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
                 model.MongoKeyFilter("_id", ReportId),
-                model.MongoKeyFilter("state", master_types.REPORT_STATE_UNVERIFIED),
             ),
 
 
@@ -92,20 +83,20 @@ value, err := model.ModelGet[master_types.Report](
         }
     }
 
-    // update Defender
+    // update RedTeam
     
     {
-        err := model.ModelUpdateField[master_types.Defender](
+        err := model.ModelUpdateField[master_types.RedTeam](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("_id", D_report.DefenderId),
+                model.MongoKeyFilter("_id", D_report.AttackTeamId),
             ),
 
 
 
             model.MongoDecField(
                 "score", 
-                DefenderScore,
+                AttackScore,
             ),
         )
 
@@ -114,13 +105,13 @@ value, err := model.ModelGet[master_types.Report](
         }
     }
 
-    // update RedTeam
+    // update Defender
     
     {
-        err := model.ModelUpdateField[master_types.RedTeam](
+        err := model.ModelUpdateField[master_types.Defender](
             model.NewMongoFilter(
                 model.MongoKeyFilter("game_id", GameId),
-                model.MongoKeyFilter("_id", D_report.AttackTeamId),
+                model.MongoKeyFilter("_id", D_report.DefenderId),
             ),
 
 
@@ -135,55 +126,13 @@ value, err := model.ModelGet[master_types.Report](
             return master_types.ErrorResponse(-500, err.Error())
         }
     }
-
-        
-    // set response directly
-    apiCustomManageReportAcceptResponse.Success = true
 /* @MT-TPL-SERVICE-END */
 
 	// TODO: add service code here, do what you want to do
 
-	// create boardcast message
-	{
-		red_team, err := model.ModelGet[master_types.RedTeam](
-			model.NewMongoFilter(
-				model.MongoKeyFilter("game_id", GameId),
-				model.MongoKeyFilter("_id", D_report.AttackTeamId),
-			),
-		)
-
-		if err != nil {
-			return master_types.ErrorResponse(-500, err.Error())
-		}
-
-		defender, err := model.ModelGet[master_types.Defender](
-			model.NewMongoFilter(
-				model.MongoKeyFilter("game_id", GameId),
-				model.MongoKeyFilter("_id", D_report.DefenderId),
-			),
-		)
-
-		if err != nil {
-			return master_types.ErrorResponse(-500, err.Error())
-		}
-
-		boardcast := master_types.Boardcast{
-			GameId:   GameId,
-			Owner:    user.Id,
-			Content:  "队伍 " + red_team.Name + " 攻击 " + defender.Name + " 成功" + "，得分 " + strconv.Itoa(Score),
-			CreateAt: time.Now().Unix(),
-		}
-
-		err = model.ModelInsert(&boardcast, nil)
-
-		if err != nil {
-			return master_types.ErrorResponse(-500, err.Error())
-		}
-	}
-
 	/* @MT-TPL-SERVICE-RESP-START */
 
-    return master_types.SuccessResponse(apiCustomManageReportAcceptResponse)
+    return master_types.SuccessResponse(apiCustomManageTraceReportAcceptResponse)
 }
 
     /* @MT-TPL-SERVICE-RESP-END */

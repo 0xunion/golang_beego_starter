@@ -19,6 +19,7 @@ func ApiCustomAdminGameCreateService(
     HeaderHtml string,
     StartTime int64,
     EndTime int64,
+    PositionCode string,
 ) (*master_types.MasterResponse) {
     var apiCustomAdminGameCreateResponse struct {
         Success bool `json:"success"`
@@ -43,6 +44,7 @@ func ApiCustomAdminGameCreateService(
         EndTime: EndTime,
         CreateAt: time.Now().Unix(),
         Owner: user.Id,
+        PositionCode: PositionCode,
     }
 
     err := model.ModelInsert(game, nil)

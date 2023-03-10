@@ -1,33 +1,26 @@
 package custom
 
-/* @MT-TPL-IMPORT-START */
 import (
 	model "github.com/0xunion/exercise_back/src/model"
 	master_types "github.com/0xunion/exercise_back/src/types"
-)
+	/* @MT-TPL-IMPORT-TIME-START */
+    /* @MT-TPL-IMPORT-TIME-END */)
 
-/* @MT-TPL-IMPORT-END */
-
-// /api/custom/manage/report/list Service 获取红队提交的报告列表
-func ApiCustomManageReportListService(
+// /api/custom/manage/trace_report/list Service 裁判获取溯源报告列表
+func ApiCustomManageTraceReportListService(
 	user *master_types.User,
 	GameId master_types.PrimaryId,
-	Page int,
-	PageSize int,
-	Order int,
-	State int,
-	Title string,
+	Page int64,
+	PageSize int64,
+	State int64,
+	Content string,
 ) *master_types.MasterResponse {
-	var apiCustomManageReportListResponse struct {
+	var apiCustomManageTraceReportListResponse struct {
 		Success bool `json:"success"`
 		Reports any  `json:"reports"`
-		Total   int  `json:"total"`
 	}
 
 	access_controll := false
-	if !access_controll && user.IsAdmin() {
-		access_controll = true
-	}
 	if !access_controll {
 		model_instance, err := model.ModelGet[master_types.Gamer](
 			model.NewMongoFilter(
@@ -40,24 +33,12 @@ func ApiCustomManageReportListService(
 			access_controll = true
 		}
 	}
-	if !access_controll {
-		model_instance, err := model.ModelGet[master_types.Gamer](
-			model.NewMongoFilter(
-				model.MongoKeyFilter("game_id", GameId),
-				model.MongoKeyFilter("owner", user.Id),
-				model.MongoKeyFilter("identity", master_types.GAMER_IDENTITY_PARTA),
-			),
-		)
-		if err == nil && model_instance != nil {
-			access_controll = true
-		}
-	}
 
 	if !access_controll {
 		return master_types.ErrorResponse(-403, "Permission denied")
 	}
 
-	// list Report
+	// list TraceReport
 	var D_page int64 = 1
 	var D_limit int64 = 10
 	var D_sort = ""
@@ -66,19 +47,19 @@ func ApiCustomManageReportListService(
 	D_sort = "_id"
 	D_value = -1
 
-	{
-		filters := make([]model.MongoFilterItem, 0)
-		if State != -1 {
-			filters = append(filters, model.MongoKeyFilter("state", State))
-		}
-		if Title != "" {
-			filters = append(filters, model.MongoSearchFilter("name", Title))
-		}
-		filters = append(filters, model.MongoKeyFilter("game_id", GameId))
+	filters := make([]model.MongoFilterItem, 0)
+	filters = append(filters, model.MongoKeyFilter("game_id", GameId))
+	if State != -1 {
+		filters = append(filters, model.MongoKeyFilter("state", State))
+	}
+	if Content != "" {
+		filters = append(filters, model.MongoKeyFilter("title", Content))
+	}
 
+	{
 		var skip = int64((D_page - 1) * D_limit)
 		var limit = int64(D_limit)
-		value, err := model.ModelGetAll[master_types.Report](
+		value, err := model.ModelGetAll[master_types.TraceReport](
 			model.NewMongoFilter(
 				filters...,
 			),
@@ -92,14 +73,14 @@ func ApiCustomManageReportListService(
 			return master_types.ErrorResponse(-500, err.Error())
 		}
 
-		apiCustomManageReportListResponse.Reports = value
+		apiCustomManageTraceReportListResponse.Reports = value
 	}
 
 	// TODO: add service code here, do what you want to do
 
 	/* @MT-TPL-SERVICE-RESP-START */
 
-    return master_types.SuccessResponse(apiCustomManageReportListResponse)
+    return master_types.SuccessResponse(apiCustomManageTraceReportListResponse)
 }
 
     /* @MT-TPL-SERVICE-RESP-END */
