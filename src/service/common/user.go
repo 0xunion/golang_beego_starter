@@ -288,3 +288,33 @@ func InitRootUserService(email string, password string) *types.MasterResponse {
 
 	return types.SuccessResponse(new_user)
 }
+
+func ResetPasswordService(user *types.User, old string, new string) *types.MasterResponse {
+	// check old password
+	password_obj, err := model.ModelGet[types.Password](
+		model.NewMongoFilter(
+			model.MongoKeyFilter("uid", user.Id),
+		),
+	)
+
+	if err != nil {
+		return types.ErrorResponse(-2003, "no password found")
+	}
+
+	if password_obj.Password != auth.HashPassword(old) {
+		return types.ErrorResponse(-2004, "password is not correct")
+	}
+
+	// update password
+	password_obj.Password = auth.HashPassword(new)
+	if err := model.ModelUpdate(
+		model.NewMongoFilter(
+			model.MongoKeyFilter("_id", password_obj.Id),
+		),
+		password_obj,
+	); err != nil {
+		return types.ErrorResponse(-2006, "update password failed")
+	}
+
+	return types.SuccessResponse(nil)
+}

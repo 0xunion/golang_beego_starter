@@ -2984,7 +2984,7 @@
             "report_id" : {
                 "type" : "master_types.PrimaryId",
                 "validate" : {}
-            },
+            }
         },
         "require_login" : true,
         "service" : {
@@ -3023,5 +3023,107 @@
         },
         "description" : "reject trace report",
         "description_cn" : "裁判拒绝溯源报告"
+    },
+    {
+        "route" : "/api/custom/attacker/self",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_ATTACKER"
+                },
+                "dst" : "gamer"
+            },
+            {
+                "type" : "get",
+                "model" : "RedTeam",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "gid" : "$gamer.GroupId"
+                },
+                "set" : "team"
+            }
+        ],
+        "response" : {
+            "team" : "*master_types.RedTeam"
+        },
+        "description" : "get attacker self info",
+        "description_cn" : "获取红队自身信息"
+    },
+    {
+        "route" : "/api/custom/defender/self",
+        "method" : "get",
+        "args" : {
+            "game_id" : {
+                "type" : "master_types.PrimaryId",
+                "validate" : {}
+            }
+        },
+        "require_login" : true,
+        "service" : {
+            "generate" : true
+        },
+        "permissions" : [
+            {
+                "mode" : "model",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_DEFENDER"
+                }
+            }
+        ],
+        "actions" : [
+            {
+                "type" : "get",
+                "model" : "Gamer",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "owner" : "$user",
+                    "identity" : "master_types.GAMER_IDENTITY_DEFENDER"
+                },
+                "dst" : "gamer"
+            },
+            {
+                "type" : "get",
+                "model" : "Defender",
+                "model_info" : {
+                    "game_id" : "GameId",
+                    "_id" : "$gamer.GroupId"
+                },
+                "set" : "defender"
+            }
+        ],
+        "response" : {
+            "defender" : "*master_types.Defender"
+        },
+        "description" : "get defender self info",
+        "description_cn" : "获取防守方自身信息"
     }
 ]

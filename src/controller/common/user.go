@@ -81,3 +81,28 @@ func (c *InfoSelfController) Get() {
 
 	c.Ctx.Output.JSON(master_types.SuccessResponse(user), true, false)
 }
+
+type ResetPasswordController struct {
+	beego.Controller
+}
+
+func (c *ResetPasswordController) Post() {
+	var request_params struct {
+		OldPassword string `json:"old_password" valid:"Required" form:"old_password"`
+		Password    string `json:"password" valid:"Required" form:"password"`
+	}
+
+	if err := controller.ParseAndValidate(&request_params, c.Controller); err != nil {
+		c.Ctx.Output.JSON(types.ErrorResponse(-400, err.Error()), true, false)
+	}
+
+	user_interface := c.Ctx.Input.GetData("user")
+	if user_interface == nil {
+		c.Ctx.Output.JSON(master_types.ErrorResponse(-401, "require login"), true, false)
+		return
+	}
+
+	user := user_interface.(*master_types.User)
+
+	c.Ctx.Output.JSON(common.ResetPasswordService(user, request_params.OldPassword, request_params.Password), true, false)
+}

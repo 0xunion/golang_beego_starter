@@ -261,3 +261,10 @@ testcase-writeable
 [INFO][cache] init cache
 [INFO][Cache] Start init redis
 [INFO][Cache] Start connect redis
+testcase-writeable
+[INFO][RuntimeManage] Start init ants pool
+[INFO][MongoDB] Init mongodb monitor
+[INFO][cache] init cache
+[INFO][Cache] Start init redis
+[INFO][Cache] Start connect redis
+[INFO][MongoDB] Connect success
